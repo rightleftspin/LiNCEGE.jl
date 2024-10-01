@@ -7,7 +7,7 @@ version = "1.0.0-DEV"
 AlgebraicNumbers = "e86d093a-a386-599e-b7c7-df0420c8bcba"
 Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
 MetaGraphsNext = "fa8bd995-216d-47f1-8a91-f3b68fbeb377"
-Nauty = "078ca17e-7fb0-5a15-af2c-e86ea292e9a4"
+NautyGraphs = "7509a0a4-015a-4167-b44b-0799a1a2605e"
 
 [compat]
 julia = "1"

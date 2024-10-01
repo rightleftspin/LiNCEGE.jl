@@ -4,28 +4,41 @@
 #               - document the function itself
 #               - convert input type for starting vertices to coordinates instead of Int64
 #
-#       grow_from_site:
+#       _grow_from_site:
 #               - add type specifications for the inputs
 #               - document the function itself
 #               - optimize the function, it really needs it
+#
+#       grow_par:
+#               - add type specifications for the inputs
+#               - document the function itself
+#               - convert input type for starting vertices to coordinates instead of Int64
+#               - write this function
+
+"""
+This is step one of the pipeline. In this step, the algorithm takes in
+an underlying cluster, the starting vertices of that cluster and the 
+order that clusters should be generated till. Using this information,
+the algorithm recursively generates an array of clusters that are
+all subclusters of specified order of the underlying cluster.
+"""
 
 """
 Main function in step one of the pipeline. Grows clusters from the given
 vertices of the underlying_cluster.
 
 Inputs: 
-      underlying_cluster: MetaGraph with coordinates as vertex labels,
-      vertex colors, and edge weights
-
-      max_order: Integer that details the highest order that
-      the subclusters will be generated till
+      underlying_cluster: Hashmap connecting vertices to an array of 
+      other vertices they are connected to
+      
+      max_order: Integer that details the order that
+      the subclusters will be generated at
 
       starting_vertices: array of vertex labels (coordinates)
       that are the coordinates that the clusters will be grown from
 
 Output:
-      Array of MetaGraph objects that are subclusters of the input
-      graphs
+      Array of subclusters of the input underlying cluster
 """
 function grow(
         underlying_cluster, 
@@ -37,9 +50,9 @@ function grow(
     guarding_set::Set{Int} = Set([])
 
     for vertex in starting_vertices
-        neighbors::Set{Int} = Set(collect(filter(neighbor -> !(neighbor in guarding_set), collect(outneighbors(underlying_cluster, vertex)))))
+        neighbors::Set{Int} = Set(collect(filter(neighbor -> !(neighbor in guarding_set), underlying_cluster[vertex])))
         vertices = [vertex]
-        grow_from_site(
+        _grow_from_site(
             underlying_cluster, 
             max_order, 
             vertices, 
@@ -58,11 +71,11 @@ Grows the subclusters from a specific site, up till specific order
 and outputs them into the out_array.
 
 Inputs: 
-      underlying_cluster: MetaGraph with coordinates as vertex labels,
+      underlying_cluster: Graph with coordinates as vertex labels,
       vertex colors, and edge weights
 
-      max_order: Integer that details the highest order that
-      the subclusters will be generated till
+      max_order: Integer that details the order that
+      the subclusters will be generated at
 
       subclusters_vertices: array of vertices that are the current
       subcluster
@@ -78,7 +91,7 @@ Output:
       Technically, the output is has_int_leaf, but in practice, the 
       output is the out_array that gets added to.
 """
-function grow_from_site(
+function _grow_from_site(
         underlying_cluster, 
         max_order::Int, 
         subcluster_vertices::Vector{Int}, 
@@ -88,7 +101,7 @@ function grow_from_site(
     )
     
     if size(subcluster_vertices)[1] == max_order
-        push!(out_array, induced_subgraph(underlying_cluster, subcluster_vertices)[1])
+        push!(out_array, subcluster_vertices)
         return true
     end
 
@@ -101,7 +114,7 @@ function grow_from_site(
 
         new_neighbors = copy(neighbors)
 
-        for vertex in outneighbors(underlying_cluster, neighbor)
+        for vertex in underlying_cluster[neighbor]
             if (!(vertex in subcluster_vertices) & 
                 !(vertex in new_guarding_set) & 
                 !(vertex in new_neighbors))
@@ -110,7 +123,7 @@ function grow_from_site(
             end
         end
 
-        if grow_from_site(underlying_cluster, 
+        if _grow_from_site(underlying_cluster, 
                           max_order, 
                           subcluster_vertices, 
                           new_neighbors, 
@@ -124,9 +137,37 @@ function grow_from_site(
             return(has_int_leaf)
         end
         push!(new_guarding_set, neighbor)
-        if (nv(underlying_cluster) - length(new_guarding_set)[1]) < max_order
+        if (length(underlying_cluster) - length(new_guarding_set)[1]) < max_order
             return(has_int_leaf)
         end
     end
     return(has_int_leaf)
 end
+
+"""
+Parallel version of the main function in step one of the pipeline.
+Grows clusters from the given vertices of the underlying_cluster.
+
+Inputs: 
+      underlying_cluster: Graph with coordinates as vertex labels,
+      vertex colors, and edge weights
+
+      max_order: Integer that details the order that
+      the subclusters will be generated at
+
+      starting_vertices: array of vertex labels (coordinates)
+      that are the coordinates that the clusters will be grown from
+
+Output:
+      Array of subclusters of the input underlying cluster
+"""
+function grow_par(
+        underlying_cluster, 
+        max_order::Int64, 
+        starting_vertices::Vector{Int64}
+    )
+end
+
+
+
+

@@ -1,12 +1,18 @@
 module NLCE
 
-include("generation.jl")
-include("tiling.jl")
-include("tagging.jl")
-include("helpers.jl")
-include("summation.jl")
+using NautyGraphs
+using Graphs
 
-include("ising.jl")
+# Add the basic pipeline
+include("pipeline/1-grow.jl")
+include("pipeline/2-prune.jl")
+include("pipeline/3-combine.jl")
+
+# Add the relevant helper functions
+include("helpers/pruning.jl")
+
+export
+    isomorphic_tagging
 
 
 # Below is an example of the NLCE process for a square lattice with only nearest neighbors
@@ -14,20 +20,20 @@ include("ising.jl")
 # more info
 
 # add write to file helper
-using AlgebraicNumbers: AlgebraicNumber as AN
-using Plots; gr()
-
-## Tasks before next meeting
-# do square, triangle and kagome lattice ising models
-
-## Setting up the lattice geometry
-basis = [[AN(0), AN(0)], [AN(1), AN(0)], [AN(1)/2, sqrt(AN(3))/2]] 
-primitive_vectors = [[AN(2), AN(0)], [AN(1), sqrt(AN(3))]]
-final_order = 7
-
-for order in 1:final_order
-    println(length(simple_nlce(basis, primitive_vectors, order)))
-end
+#using AlgebraicNumbers: AlgebraicNumber as AN
+#using Plots; gr()
+#
+### Tasks before next meeting
+## do square, triangle and kagome lattice ising models
+#
+### Setting up the lattice geometry
+#basis = [[AN(0), AN(0)], [AN(1), AN(0)], [AN(1)/2, sqrt(AN(3))/2]] 
+#primitive_vectors = [[AN(2), AN(0)], [AN(1), sqrt(AN(3))]]
+#final_order = 7
+#
+#for order in 1:final_order
+#    println(length(simple_nlce(basis, primitive_vectors, order)))
+#end
 
 #xmax = 2
 ## Initialize the temperature grid
