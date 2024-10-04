@@ -1,11 +1,7 @@
 # Need to do
 # 
-#       prune:
-#                       - Add type specifications
-#
 #       prune_par:
 #                       - Parallelize the function properly
-#                       - Add type specifications
 
 """
 This is step two of the pipeline. In this step, the algorithm takes in
@@ -33,53 +29,45 @@ Output:
       Hashmap relating the hash of the cluster to the cluster itself and
       the corresponding multiplicity of the cluster.
 """
-function prune(clusters::Vector{<:AbstractNLCECluster}, pruning_fxn)
+function prune(pruning::Function, clusters::AbstractVector{<:AbstractNLCECluster})
 
     # Initialize the empty output dictionary
-    cluster_mult = Dict()
+    cluster_mult = Dict{Integer, Tuple{<:AbstractNLCECluster, <:Integer, <:AbstractDict}}()
 
     # Add function for multiplicity
-    add_mult_one = (cluster, mult) -> (cluster, mult + 1)
+    add_mult_one = (cluster, mult, _) -> (cluster, mult + 1, Dict{Integer, Integer}())
 
     for cluster in clusters
         # Find the hash and rearranged cluster for each cluster
-        hash, permutation = pruning_fxn(cluster)
+        hash, permutation = pruning(cluster)
+
         # Add this information to the output dictionary
-        cluster_mult[hash] = add_mult_one(get(cluster_mult, hash, 0))
+        cluster_mult[hash] = add_mult_one(get(cluster_mult, hash, (cluster, 0, Dict{Integer, Integer}()))...)
     end
 
     cluster_mult
 end
 
 """
-Parallel version of the main function in step two of the pipeline. Collects clusters of the
-same type and counts their corresponding multiplicities. 
+TODO: Parallel version of this algorithm
+"""
+function prune_par() end
+
+"""
+Filters clusters that are unique  
 
 Inputs: 
-      clusters: array of clusters to be pruned
+      clusters: array of clusters to be filtered
 
       pruning_fxn: function that will be applied to each cluster,
-      needs to return a hash of the cluster and the cluster itself
-      (the function is allowed to modify the cluster)
+      needs to return a hash of the cluster and the permutation 
+      required to convert the cluster to it's isomorphic form
 
 Output:
-      Hashmap relating the hash of the cluster to the cluster itself and
-      the corresponding multiplicity of the cluster.
+      Array of clusters after filtering
 """
-function prune_par(clusters::Vector{<:AbstractNLCECluster}, pruning_fxn)
+function filtering(pruning::Function, clusters::AbstractVector{<:AbstractNLCECluster})
 
-    # Initialize the empty output dictionary
-    cluster_mult = Dict()
+    unique(cluster -> pruning(cluster)[1], clusters)       
 
-    # Add function for multiplicity
-    add_mult_one = (cluster, mult) -> (cluster, mult + 1)
-
-    for cluster in clusters
-        # Find the hash and rearranged cluster for each cluster
-        hash, new_cluster = pruning_fxn(cluster)
-        # Add this information to the output dictionary
-        cluster_mult[hash] = add_mult_one(get(cluster_mult, hash, 0))
-    end
-
-    cluster_mult
 end

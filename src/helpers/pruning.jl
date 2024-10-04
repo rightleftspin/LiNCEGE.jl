@@ -1,52 +1,30 @@
 # Need to do
-# 
-#       symmetric_pruning:
-#                       - Add type specifications
-#                       - Document function
-#                       - write efficient version, there is a way to
-#                       do it with less allocations.
 #
 #       isomorphic_pruning:
-#                       - Add type specifications
-#                       - account for edge weights, vertex colors
-#                       and complete the permutation (note for later
-#                       the permutation goes backwards from the canonized
-#                       graph to the original graph)
+#                       - account for edge weights
 
 """
 These are pruning functions to be used inside step 2 of the algorithm,
 these functions will always take in a cluster in some form and return
-a hash of the cluster and the cluster itself. In some cases, the
-function may edit the cluster, and return this edited version.
+a hash of the cluster and a potential permutation of the cluster. If
+the function returns nothing, this means that no permutation is necessary.
 """
 
 """
 Takes a cluster and finds the translationally invariant
-form of it. This does not rearrange the cluster.
+form of it.
 
 Inputs: 
-      cluster: takes the cluster with edge weights based on
-      the direction of the bond. Cluster should be of the form
-      {
-      vertex: [edge_weight, edge_weight, ...],
-      next_vertex: ...
-      }
+      cluster: takes a cluster struct, uses the direction
+      weights matrix in the cluster
 
 Output:
-      Tuple of cluster hash and cluster
+      Tuple of cluster hash and nothing
 """
-function symmetric_pruning(cluster)
-    sorted_vertices = sort(collect(keys(cluster)))
-    vertex_type_cluster = []
-    for vertex in sorted_vertices
-        vertex_type = 0
-        for edge_weight in cluster[vertex]
-            vertex_type += 2^(edge_weight - 1)
-        end
-        push!(vertex_type_cluster, vertex_type)
-    end
+function symmetric_pruning(cluster::AbstractNLCECluster)
 
-    return (cluster, vertex_type_cluster)
+    (hash(sum(weight -> 2^weight, direction_matrix(cluster)[sortperm(vertices(cluster)), :], dims=2)), nothing)
+
 end
 
 """
@@ -55,37 +33,26 @@ function rearranges the cluster according to the permutation
 used by Nauty
 
 Inputs: 
-      cluster: takes the cluster in the form of a weighted
-      edge list and an array of vertex colors. For example,
-      the graph below represents a three vertex graph in
-      which edges (1,2) and (1,3) have weight 1 and edge
-      (2,3) has weight 2. Vertices 1 and 2 have color 1 and
-      vertex 3 has color 2.
-      (
-        [[1, 2, 1], [1, 3, 1], [2, 3, 2]],
-        [1, 1, 2]
-      )
-
-      *** Note: The vertices need to be within the range
-      1 -> Number of vertices in the graph, inclusive.
+      cluster: takes in a cluster struct, uses the
+      edge_weighted_matrix inside it
 
 Output:
-      Tuple of cluster hash and rearranged cluster
+      Tuple of cluster hash and permutation from nauty
 """
-function isomorphic_pruning(cluster)
+function isomorphic_pruning(cluster::AbstractNLCECluster)
 
     # Create an empty DenseNautyGraph
-    nauty_graph = NautyGraph(length(cluster[2]))
-
-    # Populate the graph with edges
-    for (v1, v2, w) in cluster[1]
-        add_edge!(nauty_graph, v1, v2)
-    end
+    nauty_graph = NautyGraph(edge_weighted_matrix(cluster), label(cluster, vertices(cluster)))
 
     # Canonize and find the corresponding permutation 
     permutation, _ = canonize!(nauty_graph)
 
-    # Return the nauty hash and the permuted cluster
-    return (ghash(nauty_graph), cluster)
+    # Return the nauty hash and the permutation for the cluster
+    # the slice is because the permutation will potentially
+    # be longer than the initial graph, since edge weights
+    # add extra vertices
+    # Permutation goes backwards from the canonized graph to the
+    # original graph
+    return (ghash(nauty_graph), permutation[1:nv(cluster)])
 
 end

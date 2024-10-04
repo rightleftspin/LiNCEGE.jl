@@ -1,11 +1,9 @@
 # Need to do
 #       nlce_summation:
 #                       - document the function itself
-#                       - add type specifications
 #
 #       _weight:
 #                       - document the function itself
-#                       - add type specifications
 
 """
 This is step three of the pipeline. In this step, the algorithm takes in
@@ -34,10 +32,11 @@ Output:
       Hashmap of cluster hashes and their corresponding final multiplicity,
       zero for a cluster that is above the given order.
 """
-function nlce_summation(clusters, order)
+function nlce_summation(clusters::AbstractDict{Integer, Tuple{<:AbstractNLCECluster, <:Integer, <:AbstractDict}}, order::Integer)
     cluster_weights = Dict()
 
     for (cluster_hash, (cluster, cluster_mult, _)) in clusters
+        # Set clusters higher than the order to 0,
         if nv(cluster) > order
             cluster_weights[cluster_hash] = 0
         else
@@ -69,11 +68,11 @@ Output:
       Hashmap of cluster hashes and their corresponding multiplicity from
       the cluster specified in cluster_hash
 """
-function _weight(clusters, cluster_hash)
+function _weight(clusters::AbstractDict{Integer, Tuple{<:AbstractNLCECluster, <:Integer, <:AbstractDict}}, cluster_hash::Integer)
     weight_dictionary = Dict([cluster_hash => 1])
 
     if nv(clusters[cluster_hash][1]) > 1
-        for (subcluster_hash, (subcluster, subcluster_mult)) in clusters[cluster_hash][3]
+        for (subcluster_hash, subcluster_mult) in clusters[cluster_hash][3]
             sub_weights = _weight(clusters, subcluster_hash)
             map!(mult -> -1 * subcluster_mult * mult, values(sub_weights))
             weight_dictionary = mergewith(+, weight_dictionary, sub_weights)

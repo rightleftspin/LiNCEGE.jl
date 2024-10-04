@@ -11,7 +11,7 @@ function nlce_summation(clusters)
         map!(subcluster_weight -> cluster_mult * subcluster_weight, values(weights))
         cluster_weights = mergewith(+, cluster_weights, weights)
     end
-    
+
     cluster_weights
 end
 
@@ -30,4 +30,3 @@ function weight(clusters, cluster_hash)
 
     weight_dictionary
 end
-

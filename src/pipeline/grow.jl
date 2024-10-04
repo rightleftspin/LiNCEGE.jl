@@ -1,66 +1,52 @@
 # Need to do
 #       grow:
-#               - add type specifications for the inputs
 #               - document the function itself
-#               - convert input type for starting vertices to coordinates instead of Int64
 #
 #       _grow_from_site:
-#               - add type specifications for the inputs
 #               - document the function itself
 #               - optimize the function, it really needs it
 #
 #       grow_par:
-#               - add type specifications for the inputs
-#               - document the function itself
-#               - convert input type for starting vertices to coordinates instead of Int64
 #               - write this function
 
 """
 This is step one of the pipeline. In this step, the algorithm takes in
-an underlying cluster, the starting vertices of that cluster and the 
-order that clusters should be generated till. Using this information,
-the algorithm recursively generates an array of clusters that are
-all subclusters of specified order of the underlying cluster.
+a lattice and the order that clusters should be generated till. 
+Using this information, the algorithm recursively generates an array of 
+clusters that are all subclusters of specified order of the lattice.
 """
 
 """
-Main function in step one of the pipeline. Grows clusters from the given
-vertices of the underlying_cluster.
+Main function in step one of the pipeline. Grows clusters on the lattice.
 
 Inputs: 
-      underlying_cluster: Hashmap connecting vertices to an array of 
-      other vertices they are connected to
+      lattice: AbstractNLCELattice
       
       max_order: Integer that details the order that
       the subclusters will be generated at
-
-      starting_vertices: array of vertex labels (coordinates)
-      that are the coordinates that the clusters will be grown from
 
 Output:
       Array of subclusters of the input underlying cluster
 """
 function grow(
-    underlying_cluster::Union{AbstractNLCECluster,AbstractNLCELattice},
-    max_order::Int,
-    starting_vertices::Vector{V},
-) where {V<:Integer}
-
+    lattice::AbstractNLCELattice,
+    max_order::Integer,
+)
     out_array::Vector{AbstractNLCECluster} = Vector()
-    guarding_set::Set{V} = Set([])
+    guarding_set::Set{Int} = Set([])
 
-    for vertex in starting_vertices
-        init_neighbors::Set{V} = Set(
+    for vertex in center(lattice)
+        init_neighbors::Set{Int} = Set(
             collect(
                 filter(
                     neighbor -> !(neighbor in guarding_set),
-                    neighbors(underlying_cluster, vertex)[1],
+                    neighbors(lattice, vertex),
                 ),
             ),
         )
         vertices = [vertex]
         _grow_from_site(
-            underlying_cluster,
+            lattice,
             max_order,
             vertices,
             init_neighbors,
@@ -99,16 +85,17 @@ Output:
       output is the out_array that gets added to.
 """
 function _grow_from_site(
-    underlying_cluster::Union{AbstractNLCECluster,AbstractNLCELattice},
-    max_order::Int,
-    subcluster_vertices::Vector{V},
+    lattice::AbstractNLCELattice,
+    max_order::Integer,
+    subcluster_vertices::AbstractVector{V},
     current_neighbors::Set{V},
     guarding_set::Set{V},
-    out_array::Vector{<:AbstractNLCECluster},
+    out_array::AbstractVector{<:AbstractNLCECluster},
 ) where {V<:Integer}
 
+    push!(out_array, cluster(lattice, subcluster_vertices))
+
     if length(subcluster_vertices) == max_order
-        push!(out_array, cluster(underlying_cluster, subcluster_vertices))
         return true
     end
 
@@ -121,7 +108,7 @@ function _grow_from_site(
 
         new_neighbors = copy(current_neighbors)
 
-        for vertex in neighbors(underlying_cluster, neighbor)[1]
+        for vertex in neighbors(lattice, neighbor)
             if (
                 !(vertex in subcluster_vertices) &
                 !(vertex in new_guarding_set) &
@@ -133,7 +120,7 @@ function _grow_from_site(
         end
 
         if _grow_from_site(
-            underlying_cluster,
+            lattice,
             max_order,
             subcluster_vertices,
             new_neighbors,
@@ -147,7 +134,7 @@ function _grow_from_site(
             return (has_int_leaf)
         end
         push!(new_guarding_set, neighbor)
-        if (nv(underlying_cluster) - length(new_guarding_set)) < max_order
+        if (nv(lattice) - length(new_guarding_set)) < max_order
             return (has_int_leaf)
         end
     end
@@ -155,20 +142,6 @@ function _grow_from_site(
 end
 
 """
-Parallel version of the main function in step one of the pipeline.
-Grows clusters from the given vertices of the underlying_cluster.
-
-Inputs: 
-      underlying_cluster: Graph with coordinates as vertex labels,
-      vertex colors, and edge weights
-
-      max_order: Integer that details the order that
-      the subclusters will be generated at
-
-      starting_vertices: array of vertex labels (coordinates)
-      that are the coordinates that the clusters will be grown from
-
-Output:
-      Array of subclusters of the input underlying cluster
+TODO: Parallel version of this algorithm
 """
 function grow_par(underlying_cluster, max_order::Int64, starting_vertices::Vector{Int64}) end

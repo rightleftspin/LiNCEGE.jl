@@ -12,7 +12,7 @@
       {
          devShell =  pkgs.mkShell rec {
             buildInputs = with pkgs; [
-	      julia-lts-bin
+	      julia-bin
             ];
          };
       });

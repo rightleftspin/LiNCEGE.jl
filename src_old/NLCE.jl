@@ -15,17 +15,18 @@ include("ising.jl")
 
 # add write to file helper
 using AlgebraicNumbers: AlgebraicNumber as AN
-using Plots; gr()
+using Plots
+gr()
 
 ## Tasks before next meeting
 # do square, triangle and kagome lattice ising models
 
 ## Setting up the lattice geometry
-basis = [[AN(0), AN(0)], [AN(1), AN(0)], [AN(1)/2, sqrt(AN(3))/2]] 
+basis = [[AN(0), AN(0)], [AN(1), AN(0)], [AN(1) / 2, sqrt(AN(3)) / 2]]
 primitive_vectors = [[AN(2), AN(0)], [AN(1), sqrt(AN(3))]]
 final_order = 7
 
-for order in 1:final_order
+for order = 1:final_order
     println(length(simple_nlce(basis, primitive_vectors, order)))
 end
 

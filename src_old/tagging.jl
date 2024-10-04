@@ -9,12 +9,12 @@ function symmetric_tagging(cluster::AbstractGraph{T}) where {T}
     for (index, vertex) in enumerate(sorted_vertices)
         vertex_type = 0
         for neighbor in neighbor_labels(cluster, vertex)
-            vertex_type += 2 ^ (cluster[vertex, neighbor][2] - 1)
+            vertex_type += 2^(cluster[vertex, neighbor][2] - 1)
         end
-        push!(vertex_type_cluster, vertex_type)                
+        push!(vertex_type_cluster, vertex_type)
     end
-         
-    return(hash(vertex_type_cluster))
+
+    return (hash(vertex_type_cluster))
 end
 
 """
@@ -30,7 +30,7 @@ function counting(clusters, tagging_function)
     for cluster in clusters
         tag = tagging_function(cluster)
         cluster_entry = get(filtered_clusters, tag, (cluster, 0))
-        filtered_clusters[tag] = (cluster_entry[1], cluster_entry[2] + 1)  
+        filtered_clusters[tag] = (cluster_entry[1], cluster_entry[2] + 1)
     end
 
     # looks like {tag: (cluster, multiplicity)}

@@ -1,19 +1,16 @@
 name = "NLCE"
-uuid = "7a14b9fa-e824-453d-9076-5a992b27581a"
-authors = ["Pranav Seetharaman"]
-version = "1.0.0-DEV"
+uuid = "05a42466-2424-421a-a839-b20fe9622506"
+authors = ["Pranav <pranav@myrdd.info>"]
+version = "0.1.0"
 
 [deps]
-AlgebraicNumbers = "e86d093a-a386-599e-b7c7-df0420c8bcba"
-Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
-MetaGraphsNext = "fa8bd995-216d-47f1-8a91-f3b68fbeb377"
 NautyGraphs = "7509a0a4-015a-4167-b44b-0799a1a2605e"
-
-[compat]
-julia = "1"
-
-[extras]
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
+[extras]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
+
 [targets]
-test = ["Test"]
+test = ["BenchmarkTools"]
