@@ -33,7 +33,10 @@ Output:
       Hashmap relating the cluster to a hashmap of its subclusters
       and their corresponding multiplicities
 """
-function propogate(pruning_fxn::Function, clusters::AbstractDict{Integer, Tuple{<:AbstractNLCECluster, <:Integer, <:AbstractDict}})
+function propogate(
+    pruning_fxn::Function,
+    clusters::AbstractDict{Integer,Tuple{<:AbstractNLCECluster,<:Integer,<:AbstractDict}},
+)
 
     for (hash, (cluster, mult)) in clusters
         # Grow all possible subclusters smaller than the cluster then 
@@ -68,7 +71,7 @@ Output:
 function prune_cluster(pruning::Function, clusters::AbstractVector{<:AbstractNLCECluster})
 
     # Initialize the empty output dictionary
-    cluster_mult = Dict{Integer, Integer}()
+    cluster_mult = Dict{Integer,Integer}()
 
     for cluster in clusters
         hash, _ = pruning(cluster)
@@ -88,12 +91,10 @@ Inputs:
 Output:
       Array of subclusters of the input underlying cluster
 """
-function grow(
-    underlying_cluster::AbstractNLCECluster,
-)
+function grow(underlying_cluster::AbstractNLCECluster)
     out_array::Vector{AbstractNLCECluster} = Vector()
 
-    for max_order in 1:(nv(underlying_cluster) - 1) 
+    for max_order = 1:(nv(underlying_cluster)-1)
         guarding_set::Set{Int} = Set([])
         for vertex in vertices(underlying_cluster)
             init_neighbors::Set{Int} = Set(
@@ -111,7 +112,7 @@ function grow(
                 vertices,
                 init_neighbors,
                 guarding_set,
-                out_array
+                out_array,
             )
             push!(guarding_set, vertex)
         end
@@ -151,7 +152,7 @@ function _grow_from_site(
     out_array::AbstractVector{<:AbstractNLCECluster},
 ) where {V<:Integer}
 
-if length(subcluster_vertices) == max_order
+    if length(subcluster_vertices) == max_order
         push!(out_array, cluster(underlying_cluster, subcluster_vertices))
         return true
     end

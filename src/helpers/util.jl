@@ -92,3 +92,24 @@ function adj_matrix_to_adj_list(adj_matrix::AbstractMatrix{<:Integer})
     adj_list
 
 end
+
+"""
+Converts adjacency matrix for a graph to an edge list"""
+function adj_matrix_to_edge_list(adj_matrix::AbstractMatrix{<:Integer})
+
+    # Find the number of vertices in the graph
+    number_vertices = size(adj_matrix)[1]
+
+    edge_list::Vector{Vector{Int64}} = []
+
+    for i = 1:number_vertices
+        for j = i:number_vertices
+            if adj_matrix[i, j] != 0
+                push!(edge_list, [i, j, adj_matrix[i, j]])
+            end
+        end
+    end
+
+    edge_list
+
+end

@@ -18,10 +18,12 @@ include("pipeline/prune.jl")
 include("pipeline/propagate.jl")
 include("pipeline/combine.jl")
 
-#basis = [[0, 0]]
-#primitive_vec = [[1, 0], [0, 1]]
-#neighborhood = [1]
-#max_order = 10
+basis = [[0, 0]]
+primitive_vec = [[1, 0], [0, 1]]
+neighborhood = [1]
+max_order = 4
+println(simple_NLCE("square", basis, primitive_vec, neighborhood, max_order))
+
 #
 #BenchmarkTools.DEFAULT_PARAMETERS.samples = 100
 #
@@ -33,8 +35,8 @@ include("pipeline/combine.jl")
 #    println(mult_array)
 #end
 
-export 
-    simple_NLCE
+
+export simple_NLCE
 
 #xmax = 2
 ## Initialize the temperature grid

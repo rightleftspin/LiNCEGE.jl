@@ -23,7 +23,16 @@ Output:
 """
 function symmetric_pruning(cluster::AbstractNLCECluster)
 
-    (hash(sum(weight -> 2^weight, direction_matrix(cluster)[sortperm(vertices(cluster)), :], dims=2)), nothing)
+    (
+        hash(
+            sum(
+                weight -> 2^weight,
+                direction_matrix(cluster)[sortperm(vertices(cluster)), :],
+                dims = 2,
+            ),
+        ),
+        nothing,
+    )
 
 end
 
@@ -42,7 +51,8 @@ Output:
 function isomorphic_pruning(cluster::AbstractNLCECluster)
 
     # Create an empty DenseNautyGraph
-    nauty_graph = NautyGraph(edge_weighted_matrix(cluster), label(cluster, vertices(cluster)))
+    nauty_graph =
+        NautyGraph(edge_weighted_matrix(cluster), label(cluster, vertices(cluster)))
 
     # Canonize and find the corresponding permutation 
     permutation, _ = canonize!(nauty_graph)

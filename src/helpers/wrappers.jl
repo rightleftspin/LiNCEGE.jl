@@ -20,30 +20,74 @@ Inputs:
 Output:
     hashmap containing hashes of clusters and their corresponding multiplicities
 """
-function simple_NLCE(basis::AbstractVector{<:AbstractVector{T}}, primitive_vectors::AbstractVector{<:AbstractVector{T}}, neighborhood::AbstractVector{T}, max_order::Integer) where T<:Real
+function simple_NLCE(
+    nlce_type::AbstractString,
+    basis::AbstractVector{<:AbstractVector{T}},
+    primitive_vectors::AbstractVector{<:AbstractVector{T}},
+    neighborhood::AbstractVector{T},
+    max_order::Integer,
+) where {T<:Real}
 
     # Create the lattice
     lattice = NLCELattice(basis, primitive_vec, neighborhood, max_order)
     # Generate clusters on the lattice
     generated_clusters = grow(lattice, max_order)
     # find all the isomorphic clusters
-    iso_clusters = prune(isomorphic_pruning, filtering(symmetric_pruning, generated_clusters))
+    iso_clusters =
+        prune(isomorphic_pruning, filtering(symmetric_pruning, generated_clusters))
     # Find all their subclusters
-    subclusters = propogate(isomorphic_pruning, iso_clusters) 
+    subclusters = propogate(isomorphic_pruning, iso_clusters)
 
     # Initialize an empty output dictionary
-    output_dict = Dict{AbstractNLCECluster, Vector{<:Integer}}()
+    output_dict = Dict{AbstractNLCECluster,Vector{<:Integer}}()
 
     # Return the final sum for all clusters
-    for order in 1:max_order
+    for order = 1:max_order
         for (hash, mult) in nlce_summation(subclusters, order)
-            output_dict[iso_clusters[hash][1]] = append!(get(output_dict, iso_clusters[hash][1], Vector{Int}()), mult)
+            output_dict[iso_clusters[hash][1]] =
+                append!(get(output_dict, iso_clusters[hash][1], Vector{Int}()), mult)
         end
     end
 
-    output_dict
+    filename = "$(nlce_type)_$(length(neighborhood))_$(max_order)"
+    write_to_file_fortran(output_dict, filename, max_order)
+
+    filename
 
 end
 
 
+function write_to_file(nlce_output::AbstractDict{AbstractNLCECluster, Vector{<:Integer}}, filename::AbstractString)
+
+    nlce_file = open(filename, "w")
+
+    for (cluster, mults) in nlce_output
+        write(nlce_file, "$(nv(cluster)):")
+        for edge in edge_list(cluster)
+            write(nlce_file, " $(join(edge, ' '))")
+        end
+        write(nlce_file, " : $(join(mults, ' '))\n")
+    end
+    close(nlce_file)
+end
+
+function write_to_file_fortran(nlce_output::AbstractDict{AbstractNLCECluster, Vector{<:Integer}}, filename::AbstractString, max_order::Integer)
+
+    nlce_files = [open(filename * "_$(i)", "w") for i in 1:max_order]
+    sorted_clusters = sort(collect(keys(nlce_output)), by=nv)
+
+    for cluster in sorted_clusters
+        edges = edge_list(cluster)
+        write(nlce_files[nv(cluster)], "$(length(edges))\n")
+        for edge in edges
+            write(nlce_files[nv(cluster)], "$(join(edge, '\t'))\n")
+        end
+    end
+
+    for cluster in sorted_clusters
+        write(nlce_files[nv(cluster)], "$(join(nlce_output[cluster], ' '))\n")
+    end
+    
+    close.(nlce_files)
+end
 

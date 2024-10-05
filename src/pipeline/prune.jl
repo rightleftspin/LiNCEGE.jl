@@ -32,17 +32,18 @@ Output:
 function prune(pruning::Function, clusters::AbstractVector{<:AbstractNLCECluster})
 
     # Initialize the empty output dictionary
-    cluster_mult = Dict{Integer, Tuple{<:AbstractNLCECluster, <:Integer, <:AbstractDict}}()
+    cluster_mult = Dict{Integer,Tuple{<:AbstractNLCECluster,<:Integer,<:AbstractDict}}()
 
     # Add function for multiplicity
-    add_mult_one = (cluster, mult, _) -> (cluster, mult + 1, Dict{Integer, Integer}())
+    add_mult_one = (cluster, mult, _) -> (cluster, mult + 1, Dict{Integer,Integer}())
 
     for cluster in clusters
         # Find the hash and rearranged cluster for each cluster
         hash, permutation = pruning(cluster)
 
         # Add this information to the output dictionary
-        cluster_mult[hash] = add_mult_one(get(cluster_mult, hash, (cluster, 0, Dict{Integer, Integer}()))...)
+        cluster_mult[hash] =
+            add_mult_one(get(cluster_mult, hash, (cluster, 0, Dict{Integer,Integer}()))...)
     end
 
     cluster_mult
@@ -68,6 +69,6 @@ Output:
 """
 function filtering(pruning::Function, clusters::AbstractVector{<:AbstractNLCECluster})
 
-    unique(cluster -> pruning(cluster)[1], clusters)       
+    unique(cluster -> pruning(cluster)[1], clusters)
 
 end

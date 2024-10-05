@@ -32,7 +32,10 @@ Output:
       Hashmap of cluster hashes and their corresponding final multiplicity,
       zero for a cluster that is above the given order.
 """
-function nlce_summation(clusters::AbstractDict{Integer, Tuple{<:AbstractNLCECluster, <:Integer, <:AbstractDict}}, order::Integer)
+function nlce_summation(
+    clusters::AbstractDict{Integer,Tuple{<:AbstractNLCECluster,<:Integer,<:AbstractDict}},
+    order::Integer,
+)
     cluster_weights = Dict()
 
     for (cluster_hash, (cluster, cluster_mult, _)) in clusters
@@ -68,7 +71,10 @@ Output:
       Hashmap of cluster hashes and their corresponding multiplicity from
       the cluster specified in cluster_hash
 """
-function _weight(clusters::AbstractDict{Integer, Tuple{<:AbstractNLCECluster, <:Integer, <:AbstractDict}}, cluster_hash::Integer)
+function _weight(
+    clusters::AbstractDict{Integer,Tuple{<:AbstractNLCECluster,<:Integer,<:AbstractDict}},
+    cluster_hash::Integer,
+)
     weight_dictionary = Dict([cluster_hash => 1])
 
     if nv(clusters[cluster_hash][1]) > 1

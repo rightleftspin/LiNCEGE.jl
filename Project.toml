@@ -4,6 +4,7 @@ authors = ["Pranav <pranav@myrdd.info>"]
 version = "0.1.0"
 
 [deps]
+JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
 NautyGraphs = "7509a0a4-015a-4167-b44b-0799a1a2605e"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
@@ -13,4 +14,4 @@ JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["Test", "BenchmarkTools"]
+test = ["Test", "BenchmarkTools", "JuliaFormatter"]

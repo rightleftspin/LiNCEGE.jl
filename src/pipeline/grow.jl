@@ -28,20 +28,14 @@ Inputs:
 Output:
       Array of subclusters of the input underlying cluster
 """
-function grow(
-    lattice::AbstractNLCELattice,
-    max_order::Integer,
-)
+function grow(lattice::AbstractNLCELattice, max_order::Integer)
     out_array::Vector{AbstractNLCECluster} = Vector()
     guarding_set::Set{Int} = Set([])
 
     for vertex in center(lattice)
         init_neighbors::Set{Int} = Set(
             collect(
-                filter(
-                    neighbor -> !(neighbor in guarding_set),
-                    neighbors(lattice, vertex),
-                ),
+                filter(neighbor -> !(neighbor in guarding_set), neighbors(lattice, vertex)),
             ),
         )
         vertices = [vertex]
@@ -51,7 +45,7 @@ function grow(
             vertices,
             init_neighbors,
             guarding_set,
-            out_array
+            out_array,
         )
         push!(guarding_set, vertex)
     end
