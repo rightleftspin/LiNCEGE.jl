@@ -21,7 +21,6 @@ Output:
     hashmap containing hashes of clusters and their corresponding multiplicities
 """
 function simple_NLCE(
-    nlce_type::AbstractString,
     basis::AbstractVector{<:AbstractVector{T}},
     primitive_vectors::AbstractVector{<:AbstractVector{T}},
     neighborhood::AbstractVector{T},
@@ -29,7 +28,7 @@ function simple_NLCE(
 ) where {T<:Real}
 
     # Create the lattice
-    lattice = NLCELattice(basis, primitive_vec, neighborhood, max_order)
+    lattice = NLCELattice(basis, primitive_vectors, neighborhood, max_order)
     # Generate clusters on the lattice
     generated_clusters = grow(lattice, max_order)
     # find all the isomorphic clusters
@@ -49,11 +48,7 @@ function simple_NLCE(
         end
     end
 
-    filename = "$(nlce_type)_$(length(neighborhood))_$(max_order)"
-    write_to_file_fortran(output_dict, filename, max_order)
-
-    filename
-
+    output_dict
 end
 
 
@@ -73,7 +68,7 @@ end
 
 function write_to_file_fortran(nlce_output::AbstractDict{AbstractNLCECluster, Vector{<:Integer}}, filename::AbstractString, max_order::Integer)
 
-    nlce_files = [open(filename * "_$(i)", "w") for i in 1:max_order]
+    nlce_files = [open(filename * "_$(i).txt", "w") for i in 1:max_order]
     sorted_clusters = sort(collect(keys(nlce_output)), by=nv)
 
     for cluster in sorted_clusters
@@ -82,6 +77,7 @@ function write_to_file_fortran(nlce_output::AbstractDict{AbstractNLCECluster, Ve
         for edge in edges
             write(nlce_files[nv(cluster)], "$(join(edge, '\t'))\n")
         end
+        write(nlce_files[nv(cluster)], "\n")
     end
 
     for cluster in sorted_clusters
