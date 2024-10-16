@@ -10,13 +10,17 @@ function generate_coordinates(
     basis::AbstractVector{<:AbstractVector{T}},
     primitive_vectors::AbstractVector{<:AbstractVector{T}},
     max_order::Integer,
+    basis_colors::AbstractVector{<:Integer},
 ) where {T<:Real}
     dimensions = length(primitive_vectors)
     coordinates::Vector{Vector{T}} = []
+    colors::Vector{Int} = []
+    centers::Vector{Int} = []
+    total_per_basis = max_order^dimensions
     # Cover each basis
-    for basis_elem in basis
+    for (basis_ind, basis_elem) in enumerate(basis)
         # Generate all integers for coordinates in that basis
-        for int_coord = 0:((max_order^dimensions)-1)
+        for int_coord = 0:((total_per_basis)-1)
             coordinate = []
             int_coord_temp = divrem(int_coord, max_order)
             # Find each coordinate 
@@ -26,9 +30,11 @@ function generate_coordinates(
             end
             # Shift according to the primitive vectors and basis
             push!(coordinates, sum(coordinate .* primitive_vectors) .+ basis_elem)
+            append!(colors, basis_colors[basis_ind])
+            append!(centers, (div(total_per_basis, 2) + ((basis_ind - 1) * total_per_basis)))
         end
     end
-    coordinates
+    (coordinates, colors, centers)
 end
 
 """

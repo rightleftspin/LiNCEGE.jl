@@ -13,14 +13,14 @@ abstract type AbstractNLCELattice end
 
 struct NLCELattice{D,W,L} <: AbstractNLCELattice
     number_vertices::Integer
-    center::Integer
+    center::AbstractVector{<:Integer}
     vertex_labels::AbstractVector{<:Integer}
     adj_list::AbstractVector{<:AbstractVector{<:Integer}}
     adj_matrix::AbstractMatrix{<:Integer}
     adj_matrix_weights::AbstractArray{<:Integer,3}
 
     function NLCELattice(
-        center::Integer,
+        center::AbstractVector{<:Integer},
         vertex_labels::AbstractVector{<:Integer},
         adj_list::AbstractVector{<:AbstractVector{<:Integer}},
         adj_matrix::AbstractMatrix{<:Integer},
@@ -52,7 +52,7 @@ end
 
 # Adjacency Matrix Constructor
 function NLCELattice(
-    center::Integer,
+    center::AbstractVector{<:Integer},
     vertex_labels::AbstractVector{<:Integer},
     adj_matrix::AbstractMatrix{<:Integer},
     adj_matrix_weights::AbstractArray{<:Integer,3},
@@ -81,13 +81,14 @@ function NLCELattice(
     basis::AbstractVector{<:AbstractVector{T}},
     primitive_vectors::AbstractVector{<:AbstractVector{T}},
     neighborhood::AbstractVector{T},
-    max_order::Integer,
+    max_order::Integer;
+    basis_colors::AbstractVector{<:Integer} = repeat([1], length(basis))
 ) where {T<:Real}
 
     max_order_padded = (2 * max_order) + 1
-    center =
-        (div(max_order_padded, 2) + 1) + ((div(max_order_padded, 2) + 1) * max_order_padded)
-    coordinates = generate_coordinates(basis, primitive_vectors, max_order_padded)
+    #center = 
+    #    (div(max_order_padded, 2) + 1) + ((div(max_order_padded, 2) + 1) * max_order_padded)
+    coordinates, colors, centers = generate_coordinates(basis, primitive_vectors, max_order_padded, basis_colors)
 
     number_vertices = length(coordinates)
     adj_matrix = zeros(Int, number_vertices, number_vertices)
@@ -97,36 +98,37 @@ function NLCELattice(
 
     for (index_coord, coord) in enumerate(coordinates)
         for (index_distance, distance) in enumerate(neighborhood)
-            within_distance = n -> sqrt(sum((coord - n[2]) .^ 2)) ≈ distance
-            # Find all neighbors within the current distance but after the last distance
+            equal_distance = n -> sqrt(sum((coord - n[2]) .^ 2)) ≈ distance
+            # Find all neighbors equal to the current distance but after the last distance
             for (index_neighbor, neighbor) in
-                filter(within_distance, collect(enumerate(coordinates)))
+                filter(equal_distance, collect(enumerate(coordinates)))
                 direction = neighbor - coord
                 # Check the direction of the bond, ie, along which axis
-                if direction in directions
+                if findfirst(≈(direction), directions) != nothing
                     adj_matrix[index_coord, index_neighbor] = 1
                     adj_matrix_weights[1, index_coord, index_neighbor] = index_distance
                     adj_matrix_weights[2, index_coord, index_neighbor] =
-                        findfirst(==(direction), directions)
+                        findfirst(≈(direction), directions)
                 else
                     append!(directions, [direction])
                     adj_matrix[index_coord, index_neighbor] = 1
                     adj_matrix_weights[1, index_coord, index_neighbor] = index_distance
                     adj_matrix_weights[2, index_coord, index_neighbor] =
-                        findfirst(==(direction), directions)
+                        findfirst(≈(direction), directions)
                 end
             end
         end
     end
 
+    println(directions)
     NLCELattice(
-        center,
-        ones(Int64, number_vertices),
+        centers,
+        colors,
         adj_matrix,
         adj_matrix_weights,
         false,
-        false,
-        false,
+        (length(neighborhood) > 1),
+        (length(unique(basis_colors)) > 1),
     )
 
 end
