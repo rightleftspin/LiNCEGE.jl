@@ -125,11 +125,54 @@ Find the permutation group representation of a given group of transformations
 on the given coordinates. 
     
 """
-function find_permutations(coordinates::Vector{Vector{Real}}, group)
-    permutations = [] 
-    for group_elem in group
-        push!(permutations, findfirst.(isapprox.([group_elem * coord for coord in coordinates]), (coordinates,)))   
-    end
+function find_permutations(coordinates::Vector{Vector{Real}}, centers, group)
+    # Shift coordinates to the center
+    permutations::Vector{Vector{Int}} = []
+    center = sum(coordinates[centers]) / length(centers)
+    center = coordinates[centers][2]
 
+#    number_per_basis = div(length(coordinates), length(basis))
+    for elem in group
+        partial_coords = [coord - center for coord in coordinates]
+        push!(permutations, replace(findfirst.(isapprox.([elem * coord for coord in partial_coords], atol=1e-5), (partial_coords,)), nothing => 1e10))
+    end            
+    
+    println(length.(unique.(permutations)))
     permutations
 end
+    
+
+  #  for center in centers
+  #  new_coordinates = []
+
+  #  println(new_coordinates)
+  #  println(group[2])
+  #  println([group[2] * coord for coord in new_coordinates])
+
+  #  permutations = [] 
+  #  for group_elem in group
+  #      this_perm = []
+  #      for coord_ch in new_coordinates
+  #          temp_coord = group_elem * coord_ch
+  #          for (ind, coord) in enumerate(new_coordinates)
+  #              if isapprox(temp_coord, coord, atol=1e-3)
+  #                  push!(this_perm, ind)
+  #             # elseif isapprox(sum(temp_coord.^2), sum(coord.^2), atol=1e-4)
+  #             #     if (isapprox(temp_coord[1], coord[1]) && isapprox(temp_coord[2], coord[2]))
+  #             #          println("--------------")
+  #             #          println(group_elem * coord_ch)
+  #             #          println(coord)
+  #             #      end
+  #              end
+  #          end
+  #      end
+  #      push!(permutations, this_perm)
+
+  #     # push!(permutations, findfirst.(isapprox.([group_elem * coord for coord in new_coordinates], atol=1e-5), (new_coordinates,)))   
+   # end
+
+    #println(length(coordinates))
+    #println(permutations)
+#    println(length.(unique.(permutations)))
+#    permutations
+##end

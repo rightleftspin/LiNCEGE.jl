@@ -18,6 +18,7 @@ struct NLCELattice{D,W,L} <: AbstractNLCELattice
     adj_list::AbstractVector{<:AbstractVector{<:Integer}}
     adj_matrix::AbstractMatrix{<:Integer}
     adj_matrix_weights::AbstractArray{<:Integer,3}
+    coordinates::AbstractVector{<:AbstractVector{<:Real}}
 
     function NLCELattice(
         center::AbstractVector{<:Integer},
@@ -25,6 +26,7 @@ struct NLCELattice{D,W,L} <: AbstractNLCELattice
         adj_list::AbstractVector{<:AbstractVector{<:Integer}},
         adj_matrix::AbstractMatrix{<:Integer},
         adj_matrix_weights::AbstractArray{<:Integer,3},
+        coordinates::AbstractVector{<:AbstractVector{<:Real}},
         directed::Bool,
         edge_weighted::Bool,
         vertex_labeled::Bool,
@@ -46,6 +48,7 @@ struct NLCELattice{D,W,L} <: AbstractNLCELattice
             adj_list,
             adj_matrix,
             adj_matrix_weights,
+            coordinates,
         )
     end
 end
@@ -56,6 +59,7 @@ function NLCELattice(
     vertex_labels::AbstractVector{<:Integer},
     adj_matrix::AbstractMatrix{<:Integer},
     adj_matrix_weights::AbstractArray{<:Integer,3},
+    coordinates::AbstractVector{<:AbstractVector{<:Real}},
     directed::Bool,
     edge_weighted::Bool,
     vertex_labeled::Bool,
@@ -67,6 +71,7 @@ function NLCELattice(
         adj_matrix_to_adj_list(adj_matrix),
         adj_matrix,
         adj_matrix_weights,
+        coordinates,
         directed,
         edge_weighted,
         vertex_labeled,
@@ -124,6 +129,7 @@ function NLCELattice(
         colors,
         adj_matrix,
         adj_matrix_weights,
+        coordinates,
         false,
         (length(neighborhood) > 1),
         (length(unique(basis_colors)) > 1),
@@ -147,4 +153,6 @@ begin #Required functions for the pipeline
         adjacency_matrix(lattice)[vertices, vertices],
         adjacency_matrix_weights(lattice)[:, vertices, vertices],
     )
+
+    get_coordinates(lattice::NLCELattice, vertices::Union{Integer, AbstractArray}) = lattice.coordinates[vertices]
 end
