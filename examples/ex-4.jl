@@ -1,6 +1,7 @@
 """
 Example generating the data for a pyrocholre lattice and 
-writing to a file meant to be read by fortran code
+writing to a file that will be the default output of this
+algorithm
 """
 module ex4
 

@@ -11,6 +11,7 @@ include("structs/NLCEClusters.jl")
 include("helpers/pruning.jl")
 include("helpers/util.jl")
 include("helpers/wrappers.jl")
+include("helpers/symmetries.jl")
 
 # Add the basic pipeline
 include("pipeline/grow.jl")

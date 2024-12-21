@@ -12,7 +12,28 @@ the function returns nothing, this means that no permutation is necessary.
 
 """
 Takes a cluster and finds the translationally invariant
-form of it.
+form of it. This does not return a hash.
+
+Inputs: 
+      cluster: takes a cluster struct, uses the direction
+      weights matrix in the cluster
+
+Output:
+      Vector of cluster translational form
+"""
+function translational_form(cluster::AbstractNLCECluster)
+    vec(
+        sum(
+            weight -> 2^weight,
+            direction_matrix(cluster)[sortperm(vertices(cluster)), :],
+            dims = 2,
+        ),
+    )
+end
+
+"""
+Takes a cluster and finds the translationally invariant hash 
+of it.
 
 Inputs: 
       cluster: takes a cluster struct, uses the direction
@@ -23,16 +44,7 @@ Output:
 """
 function translational_pruning(cluster::AbstractNLCECluster)
 
-    (
-        hash(
-            sum(
-                weight -> 2^weight,
-                direction_matrix(cluster)[sortperm(vertices(cluster)), :],
-                dims = 2,
-            ),
-        ),
-        nothing,
-    )
+    (hash(translational_form(cluster)), nothing)
 
 end
 
@@ -67,36 +79,16 @@ function isomorphic_pruning(cluster::AbstractNLCECluster)
 
 end
 
-"""
-Takes a cluster and finds the translationally invariant
-form of it. This does not return a hash.
-
-Inputs: 
-      cluster: takes a cluster struct, uses the direction
-      weights matrix in the cluster
-
-Output:
-      Tuple of cluster hash and nothing
-"""
-function translational_form(cluster::AbstractNLCECluster)
-
-            vec(sum(
-                weight -> 2^weight,
-                direction_matrix(cluster)[sortperm(vertices(cluster)), :],
-                dims = 2,
-               ))
-
-end
 
 function symmetric_pruning(cluster::AbstractNLCECluster)
-
-    (hash(sort(translational_form.(cluster.(underlying_lattice(cluster), [perm[vertices(cluster)] for perm in permutations])))), nothing)  
-end
-
-function symmetric_pruning_square(cluster::AbstractNLCECluster)
-
-end
-
-function symmetric_pruning_triangular(cluster::AbstractNLCECluster)
-
+    (
+        hash(
+            sort(([
+                translational_form(
+                    cluster(underlying_lattice(cluster), perm[vertices(cluster)]),
+                ) for perm in permutations(underlying_lattice(cluster))
+            ])),
+        ),
+        nothing,
+    )
 end

@@ -90,11 +90,29 @@ function coord_NLCE(
     # Generate clusters on the lattice
     generated_clusters = grow(lattice, max_order)
     # find all the symmetrically distinct clusters
-    coordinates, colors, centers = generate_coordinates(basis, primitive_vectors, 2 * max_order + 1, repeat([1], length(basis)))
+    coordinates, colors, centers = generate_coordinates(
+        basis,
+        primitive_vectors,
+        max_order,
+        repeat([1], length(basis)),
+    )
+
     permutations = find_permutations(coordinates, centers, symmetries)
 
 
-    symmetric_pruning(cluster_pruning) = (hash(sort(NLCE.translational_form.([cluster(underlying_lattice(cluster_pruning), perm[vertices(cluster_pruning)]) for perm in permutations]))), nothing)  
+    symmetric_pruning(cluster_pruning) = (
+        hash(
+            sort(
+                NLCE.translational_form.([
+                    cluster(
+                        underlying_lattice(cluster_pruning),
+                        perm[vertices(cluster_pruning)],
+                    ) for perm in permutations
+                ]),
+            ),
+        ),
+        nothing,
+    )
 
     sym_clusters =
         prune(symmetric_pruning, filtering(translational_pruning, generated_clusters))
@@ -155,7 +173,7 @@ function write_to_file_coordinates(
         end
         for coord in all_coordinates(cluster)
             write(nlce_file, " ($(join(coord, ',')))")
-        end                        
+        end
         write(nlce_file, " : $(join(mults, ' '))\n")
     end
     close(nlce_file)

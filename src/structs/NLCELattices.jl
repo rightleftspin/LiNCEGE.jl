@@ -90,7 +90,7 @@ function NLCELattice(
     basis_colors::AbstractVector{<:Integer} = repeat([1], length(basis)),
 )
 
-    max_order_padded = (2 * max_order) + 1
+    max_order_padded = max_order
     coordinates, colors, centers =
         generate_coordinates(basis, primitive_vectors, max_order_padded, basis_colors)
 
@@ -154,5 +154,6 @@ begin #Required functions for the pipeline
         adjacency_matrix_weights(lattice)[:, vertices, vertices],
     )
 
-    get_coordinates(lattice::NLCELattice, vertices::Union{Integer, AbstractArray}) = lattice.coordinates[vertices]
+    get_coordinates(lattice::NLCELattice, vertices::Union{Integer,AbstractArray}) =
+        lattice.coordinates[vertices]
 end

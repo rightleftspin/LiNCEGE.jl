@@ -2,7 +2,7 @@
 Example generating the data for a kagome lattice and 
 writing to a file meant to be read by fortran code
 """
-module ex1
+module ex3
 
 using NLCE
 

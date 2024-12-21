@@ -2,7 +2,7 @@
 Example generating the data for a triangular lattice and 
 writing to a file meant to be read by fortran code
 """
-module ex1
+module ex2
 
 using NLCE
 

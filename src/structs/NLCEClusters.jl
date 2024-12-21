@@ -41,7 +41,8 @@ begin #Required functions for the pipeline
         adjacency_matrix(underlying_lattice(cluster))[vertices, vertices],
         adjacency_matrix_weights(underlying_lattice(cluster))[:, vertices, vertices],
     )
-    get_coordinates(cluster::NLCECluster, vertices::Union{Integer, AbstractArray}) = get_coordinates(underlying_lattice(cluster), vertices)
+    get_coordinates(cluster::NLCECluster, vertices::Union{Integer,AbstractArray}) =
+        get_coordinates(underlying_lattice(cluster), vertices)
     all_coordinates(cluster::NLCECluster) = get_coordinates(cluster, vertices(cluster))
 
     function permute!(cluster::NLCECluster, permutation::AbstractVector{<:Integer})
