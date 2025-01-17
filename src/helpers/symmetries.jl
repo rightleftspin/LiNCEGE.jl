@@ -3,7 +3,7 @@ Defines symmetry groups that are useful for a variety of lattices.
 """
 
 using Rotations
-# Define the axes
+# Define the axes in 3D
 x, y, z = [1, 0, 0], [0, 1, 0], [0, 0, 1]
 
 # Identity
@@ -79,6 +79,15 @@ sid = [inv * x for x in c2p]
 pyrochlore_symmetries = [ident, c2... , c2p... , c3... , c4... , inv, s4... , s6... , sih... , sid...]
 
 
-#for elem in pyrochlore_symmetries
-#    elem[abs.(elem) .< 1e-12] .= 0
-#end
+iden_2D = [1 0; 0 1]
+
+rotate_90CCW = [0 -1; 1 0]
+rotate_180CCW = rotate_90CCW * rotate_90CCW
+rotate_270CCW = rotate_180CCW * rotate_90CCW
+
+flip_x = [1 0; 0 -1]
+flip_y = [-1 0; 0 1]
+flip_right_diag = [0 1; 1 0]
+flip_left_diag = [0 -1; -1 0]
+
+square_symmetries = [iden_2D, rotate_90CCW, rotate_180CCW, rotate_270CCW, flip_x, flip_y, flip_right_diag, flip_left_diag]

@@ -88,26 +88,10 @@ function coord_NLCE(
     # Create the lattice
     lattice = NLCELattice(basis, primitive_vectors, neighborhood, max_order, symmetries = symmetries)
     # Generate clusters on the lattice
-    println(all_coordinates(lattice))
     generated_clusters = grow(lattice, max_order)
     # find all the symmetrically distinct clusters
     sym_clusters =
         prune(symmetric_pruning, filtering(translational_pruning, generated_clusters))
-
-    #for (k, v) in sym_clusters
-    #    println(k)
-    #    println(v[2])
-    #end
-    #iso_clusters = prune(isomorphic_pruning, sym_clusters)
-    #count = 0
-    #for (cluster, vals) in sym_clusters
-    #    if nv(vals[1]) == 5
-    #        count += vals[2]
-    #    end
-    #    println(nv(vals[1]))
-    #end
-    #println("")
-    #println(count)
 
     # Account for the size of the unit cell in the pruning
     for (hash, (cluster, mult, subcluster_mult)) in sym_clusters
@@ -121,6 +105,7 @@ function coord_NLCE(
 
     # Initialize an empty output dictionary
     output_dict = Dict{AbstractNLCECluster,Vector{<:Real}}()
+    cluster_hashes = Dict{AbstractNLCECluster, Integer}()
 
     # Return the final sum for all clusters
     for order = 1:max_order

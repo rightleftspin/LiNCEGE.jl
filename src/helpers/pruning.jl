@@ -81,7 +81,6 @@ end
 
 
 function symmetric_pruning(cluster_prehash::AbstractNLCECluster)
-    println([perm[vertices(cluster_prehash)] for perm in permutations(underlying_lattice(cluster_prehash))])
     (
         hash(
             sort(([

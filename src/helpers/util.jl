@@ -172,6 +172,7 @@ end
 
 function write_to_file_coordinates(
     nlce_output::AbstractDict{AbstractNLCECluster,Vector{<:Real}},
+    cluster_hashes::AbstractDict{AbstractNLCECluster, Integer},
     filename::AbstractString,
 )
 
@@ -179,6 +180,7 @@ function write_to_file_coordinates(
 
     for (cluster, mults) in nlce_output
         write(nlce_file, "$(nv(cluster)):")
+        write(nlce_file, " $(cluster_hashes[cluster])")
         for edge in edge_list(cluster)
             write(nlce_file, " $(join(edge, ' '))")
         end
