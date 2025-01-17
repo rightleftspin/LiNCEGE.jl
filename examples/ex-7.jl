@@ -18,7 +18,7 @@ neighborhood = [1]
 max_order = 4
 
 # Generating all the clusters using this information
-nlce_clusters = coord_NLCE(NLCE.square_symmetries, basis, primitive_vec, neighborhood, max_order)
+nlce_clusters, cluster_hashes, cluster_perms = coord_NLCE(NLCE.square_symmetries, basis, primitive_vec, neighborhood, max_order)
 
 # Writing all the files to the corresponding folder, creating the folder
 # if it does not exist
@@ -27,6 +27,6 @@ mkpath(filepath)
 filename = filepath * "/square_nn_sym"
 
 # Write all the files in the default format
-NLCE.write_to_file_coordinates(nlce_clusters, filename)
+NLCE.write_to_file_coordinates(nlce_clusters, cluster_hashes, cluster_perms, filename)
 
 end

@@ -102,7 +102,7 @@ function NLCELattice(
     permutations = Nothing
 
     if symmetries != Nothing
-        permutations = find_permutations(coordinates, symmetries)
+        permutations = find_permutations(coordinates, symmetries, [[0, 0]])
     end
 
     number_vertices = length(coordinates)

@@ -153,19 +153,24 @@ Finds a permutation representation of a given group of transformations
 on the given coordinates. 
     
 """
-function find_permutations(coordinates, group)
+function find_permutations(coordinates, group, shifts)
     permutations::Vector{Vector{Union{Int, Nothing}}} = []
 
     for elem in group
+        max_perm = findfirst.(isapprox.([elem * coord + shifts[1] for coord in coordinates], atol = 1e-5), (coordinates,))
+
+        for shift in shifts[2:end]
+            perm = findfirst.(isapprox.([elem * coord + shift for coord in coordinates], atol = 1e-5), (coordinates,))
+            if length(perm) > lenth(max_perm)
+                max_perm = perm
+            end
+        end
         push!(
             permutations,
-                findfirst.(
-                    isapprox.([elem * coord for coord in coordinates], atol = 1e-5),
-                    (coordinates,),
-                ),
+            max_perm
         )
     end
-
+    
     println(length.(unique.(permutations)))
     permutations
 end
@@ -173,21 +178,24 @@ end
 function write_to_file_coordinates(
     nlce_output::AbstractDict{AbstractNLCECluster,Vector{<:Real}},
     cluster_hashes::AbstractDict{AbstractNLCECluster, Integer},
+    cluster_perms::AbstractDict{AbstractNLCECluster, Vector{<:Integer}},
     filename::AbstractString,
 )
 
     nlce_file = open(filename, "w")
 
     for (cluster, mults) in nlce_output
+        perm = cluster_perms[cluster]
         write(nlce_file, "$(nv(cluster)):")
-        write(nlce_file, " $(cluster_hashes[cluster])")
+        write(nlce_file, " $(cluster_hashes[cluster]):")
         for edge in edge_list(cluster)
-            write(nlce_file, " $(join(edge, ' '))")
+            write(nlce_file, " $(join((findall(x -> x == edge[1], perm)[1], findall(x -> x == edge[2], perm)[1], edge[3]), ' '))")
         end
-        for coord in all_coordinates(cluster)
+        write(nlce_file, ":")
+        for coord in all_coordinates(cluster)[perm]
             write(nlce_file, " ($(join(coord, ',')))")
         end
-        write(nlce_file, " : $(join(mults, ' '))\n")
+        write(nlce_file, ": $(join(mults, ' '))\n")
     end
     close(nlce_file)
 end

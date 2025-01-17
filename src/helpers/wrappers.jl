@@ -106,15 +106,19 @@ function coord_NLCE(
     # Initialize an empty output dictionary
     output_dict = Dict{AbstractNLCECluster,Vector{<:Real}}()
     cluster_hashes = Dict{AbstractNLCECluster, Integer}()
+    cluster_perms = Dict{AbstractNLCECluster, Vector{<:Integer}}()
 
     # Return the final sum for all clusters
     for order = 1:max_order
         for (hash, mult) in nlce_summation(subclusters, order)
+            chash, perm = isomorphic_pruning(sym_clusters[hash][1])
+            cluster_hashes[sym_clusters[hash][1]] = chash
+            cluster_perms[sym_clusters[hash][1]] = perm
             output_dict[sym_clusters[hash][1]] =
                 append!(get(output_dict, sym_clusters[hash][1], Vector{Real}()), mult)
         end
     end
 
-    output_dict
+    output_dict, cluster_hashes, cluster_perms
 end
 

@@ -73,8 +73,8 @@ function isomorphic_pruning(cluster::AbstractNLCECluster)
     # the slice is because the permutation will potentially
     # be longer than the initial graph, since edge weights
     # add extra vertices
-    # Permutation goes backwards from the canonized graph to the
-    # original graph
+    # Permutation goes from the original graph to the
+    # canonized graph
     return (ghash(nauty_graph), permutation[1:nv(cluster)])
 
 end
