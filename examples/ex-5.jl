@@ -19,11 +19,8 @@ primitive_vec = [[0, 1 / 2, 1 / 2], [1 / 2, 0, 1 / 2], [1 / 2, 1 / 2, 0]]
 
 neighborhood = [sqrt(2) / 4]
 
-max_order = 5
+max_order = 3
 
-#for elem in NLCE.pyrochlore_symmetries
-#    display(elem)
-#end
 # Generating all the clusters using this information
 nlce_clusters, cluster_hashes, cluster_perms = coord_NLCE(NLCE.pyrochlore_symmetries, basis, primitive_vec, neighborhood, max_order)
 
@@ -31,7 +28,7 @@ nlce_clusters, cluster_hashes, cluster_perms = coord_NLCE(NLCE.pyrochlore_symmet
 # if it does not exist
 filepath = "examples/outputs/ex-5/pyrochlore_nn_sym"
 mkpath(filepath)
-filename = filepath * "/pyrochlore_nn_sym"
+filename = filepath * "/pyrochlore_nn_sym_$(max_order)"
 
 # Write all the files in the default format
 NLCE.write_to_file_coordinates(nlce_clusters, cluster_hashes, cluster_perms, filename)

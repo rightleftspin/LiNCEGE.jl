@@ -155,10 +155,18 @@ function find_permutations(coordinates, group, shifts)
     permutations::Vector{Vector{Union{Int, Nothing}}} = []
 
     for elem in group
-        max_perm = findfirst.(isapprox.([(elem * coord) + shifts[1] for coord in coordinates], atol = 1e-5), (coordinates,))
+        transformed_coords = [(elem * coord) for coord in coordinates]
 
+#        perm_lengths = zeros(length(shifts))
+#
+#        for shift_i = 1:length(shifts)
+#            perm_lengths[shift_i] = 
+#
+        max_perm = findfirst.(isapprox.([(coord + shifts[1]) for coord in transformed_coords], atol = 1e-5), (coordinates,))
+
+        # This loop needs to be optimized, very parallelizeable
         for shift in shifts[2:end]
-            perm = findfirst.(isapprox.([(elem * coord) + shift for coord in coordinates], atol = 1e-5), (coordinates,))
+            perm = findfirst.(isapprox.([(coord + shift) for coord in transformed_coords], atol = 1e-5), (coordinates,))
             if length(unique(perm)) > length(unique(max_perm))
                 max_perm = copy(perm)
             end
@@ -168,8 +176,9 @@ function find_permutations(coordinates, group, shifts)
             max_perm
         )
     end
+
+    #println(length.(unique.(permutations)))
     
-    println(length.(unique.(permutations)))
     permutations
 end
 

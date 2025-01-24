@@ -102,8 +102,13 @@ function NLCELattice(
     permutations = nothing
 
     if symmetries != nothing
-        shifts = [site ./ 2 for site in eachcol(generate_primitive_lattice(primitive_vectors, fld(max_order, 2))[1])]
-        permutations = find_permutations(coordinates, symmetries, shifts)
+        if max_order > 1
+            shifts = [site ./ 2 for site in eachcol(generate_primitive_lattice(primitive_vectors, 2)[1])]
+            permutations = find_permutations(coordinates, symmetries, shifts)
+        else
+            shifts = [site ./ 2 for site in eachcol(generate_primitive_lattice(primitive_vectors, 1)[1])]
+            permutations = find_permutations(coordinates, symmetries, shifts)
+        end
     end
 
     number_vertices = length(coordinates)
