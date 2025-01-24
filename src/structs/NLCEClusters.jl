@@ -11,6 +11,7 @@ struct NLCECluster <: AbstractNLCECluster
     lattice::AbstractNLCELattice
     adj_matrix::AbstractMatrix{<:Integer}
     adj_matrix_weights::AbstractArray{<:Integer,3}
+    orbits::Vector{<:Integer}
 
     # Basic Constructor
     function NLCECluster(
@@ -19,7 +20,7 @@ struct NLCECluster <: AbstractNLCECluster
         adj_matrix::AbstractMatrix{<:Integer},
         adj_matrix_weights::AbstractArray{<:Integer,3},
     )
-        return new(vertices, lattice, adj_matrix, adj_matrix_weights)
+        return new(vertices, lattice, adj_matrix, adj_matrix_weights, Vector{Integer}())
     end
 end
 
@@ -55,5 +56,15 @@ begin #Required functions for the pipeline
     end
 
     edge_list(cluster::NLCECluster) = adj_matrix_to_edge_list(edge_weighted_matrix(cluster))
+
+    function add_orbits!(cluster::NLCECluster, orbits::AbstractVector{<:Integer})
+        if isempty(cluster.orbits)
+            append!(cluster.orbits, orbits)
+        end
+        
+        cluster.orbits
+    end
+
+    orbits(cluster::NLCECluster) = cluster.orbits
 
 end

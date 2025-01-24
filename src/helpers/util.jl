@@ -193,6 +193,7 @@ function write_to_file_coordinates(
         for coord in all_coordinates(cluster)[perm]
             write(nlce_file, " ($(join(coord, ',')))")
         end
+        write(nlce_file, ": $(join(orbits(cluster)[perm], ' '))")
         write(nlce_file, ": $(join(mults, ' '))\n")
     end
     close(nlce_file)
