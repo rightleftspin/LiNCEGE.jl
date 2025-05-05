@@ -177,7 +177,7 @@ function Cluster(
         distance_matrix(underlying_cluster)[underlying_vertices, underlying_vertices],
         underlying_cluster,
         underlying_vertices,
-        coordinate_bundle(underlying_cluster, underlying_super_vertices),
+        reindexed_coordinate_bundle(underlying_cluster, underlying_super_vertices, Dict((underlying_vertices[i] => i for i=1:length(underlying_vertices)))),
         super_adj_list(underlying_cluster, underlying_super_vertices),
         true,
         V,
@@ -187,6 +187,12 @@ end
 
 begin # Standard Access functions
     nv(cluster::Cluster) = size(cluster.coordinates)[2]
+    nv_sv(cluster::Cluster) = length(cluster.coordinate_bundles)
+    nv_weights(cluster::Cluster) = (nv(cluster) == 1) ? 1 : (length(cluster.coordinate_bundles) + 1)
+    dimensions(cluster::Cluster) = size(cluster.coordinates)[1]
+    has_underlying_cluster(cluster::Cluster{U, <:Any, <:Any}) where {U} = U
+    vertex_labeled(cluster::Cluster{<:Any, V, <:Any}) where {V} = V
+    edge_labeled(cluster::Cluster{<:Any, <:Any, E}) where {E} = E
     vertices(cluster::Cluster) = Vector(1:nv(cluster))
     coordinates(cluster::Cluster, vertices::Union{Integer, AbstractVector}) = cluster.coordinates[:, vertices]
     all_coordinates(cluster::Cluster) = cluster.coordinates
@@ -209,11 +215,12 @@ begin # Standard Access functions
 
     all_vertices(cluster::Cluster, super_verts::Union{Integer, AbstractVector}) = unique(vcat(coordinate_bundle(cluster, super_verts)...))
     coordinate_bundle(cluster::Cluster, super_verts::Union{Integer, AbstractVector}) = cluster.coordinate_bundles[super_verts]
+    reindexed_coordinate_bundle(cluster::Cluster, super_verts::Union{Integer, AbstractVector}, reindexed_underlying_verts::AbstractDict) = [[reindexed_underlying_verts[vert] for vert in con] for con in cluster.coordinate_bundles[super_verts]]
     super_adj_list(cluster::Cluster, super_verts::Union{Integer, AbstractVector}) = reindex_adj_list(cluster.super_adj_list, super_verts)
 
     Base.show(io::IO, cluster::Cluster) = print(io, "Cluster with $(nv(cluster)) vertices and $(length(edge_list(cluster))) bonds. Super lattice contains $(length(cluster.super_adj_list)) super vertices")
 
-    # Sets default hashing of a cluster to be the translationally invariant hash
+    # Sets default hashing of a cluster to be the translationally in[1]variant hash
     Base.hash(cluster::Cluster, h::UInt) = hash(translational_pruning(cluster), h)
     Base.isequal(cluster1::Cluster, cluster2::Cluster) = (translational_pruning(cluster1) == translational_pruning(cluster2))
 end
@@ -399,6 +406,22 @@ function grow(underlying_cluster::Cluster, max_order::Integer)
         push!(guarding_set, vertex)
     end
 
+    if !has_underlying_cluster(underlying_cluster)
+        push!(out_array,
+        Cluster(
+            zeros(dimensions(underlying_cluster), 1),
+            [1],
+            zeros(Int, 2, 1, 1),
+            zeros(1, 1),
+            underlying_cluster,
+            zeros(Int, 0),
+            [zeros(Int, 0)],
+            [zeros(Int, 0)],
+            true,
+            vertex_labeled(underlying_cluster),
+            edge_labeled(underlying_cluster),
+        ))
+    end
     out_array
 end
 
@@ -479,7 +502,7 @@ function _grow_from_site(
             return (has_int_leaf)
         end
         push!(new_guarding_set, neighbor)
-        if (nv(lattice) - length(new_guarding_set)) < max_order
+        if (nv_sv(lattice) - length(new_guarding_set)) < max_order
             return (has_int_leaf)
         end
     end
@@ -493,8 +516,26 @@ for each order until the max order in the cluster
 function grow(underlying_cluster::Cluster{true, <:Any, <:Any})
     out_array::Vector{AbstractCluster} = Vector()
 
-    for max_order = 1:(nv(underlying_cluster)-1)
+    for max_order = 1:(nv_sv(underlying_cluster)-1)
         append!(out_array, grow(underlying_cluster, max_order))
+    end
+
+    if nv_sv(underlying_cluster) != nv(underlying_cluster)
+    # add in the single site for cluster expansions
+    append!(out_array,
+    repeat([Cluster(
+        zeros(dimensions(underlying_cluster), 1),
+        [1],
+        zeros(Int, 2, 1, 1),
+        zeros(1, 1),
+        underlying_cluster,
+        zeros(Int, 0),
+        [zeros(Int, 0)],
+        [zeros(Int, 0)],
+        true,
+        vertex_labeled(underlying_cluster),
+        edge_labeled(underlying_cluster),
+    )], nv(underlying_cluster)) )
     end
 
     out_array
@@ -571,7 +612,7 @@ function _grow_from_site(
             return (has_int_leaf)
         end
         push!(new_guarding_set, neighbor)
-        if (nv(underlying_cluster) - length(new_guarding_set)) < max_order
+        if (nv_sv(underlying_cluster) - length(new_guarding_set)) < max_order
             return (has_int_leaf)
         end
     end

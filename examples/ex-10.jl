@@ -47,17 +47,41 @@ println("clusters")
 iso_clusters = NLCE.prune(NLCE.isomorphic_pruning, Set(generated_clusters))
 println("iso")
 
-#for (hash, cluster) in iso_clusters
-#    println(cluster[1])
-#    println(cluster[2])
-#end
-#
 
 propogated = NLCE.propogate(NLCE.isomorphic_pruning, iso_clusters)
 println("propogated")
+for (hash, cluster) in propogated
+    println("$(hash): $(cluster[1])")
+    for (hash, mult) in cluster[3]
+        println(hash)
+        println(mult)
+        end
+end
+println("--------------------------")
 
-sums = NLCE.nlce_summation(propgated, max_order)
-println(typeof(sums))
+
+#sums = NLCE.nlce_summation(propogated, max_order)
+
+
+# Initialize an empty output dictionary
+output_dict = Dict{NLCE.Cluster, Vector{<:Real}}()
+
+# Return the final sum for all clusters
+for order = 1:(max_order + 1)
+    for (hash, mult) in NLCE.nlce_summation(propogated, order)
+        output_dict[iso_clusters[hash][1]] =
+            append!(get(output_dict, iso_clusters[hash][1], Vector{Real}()), mult)
+    end
+end
+
+# Writing all the files to the corresponding folder, creating the folder
+# if it does not exist
+filepath = "examples/outputs/ex-10/ssl_dimer"
+mkpath(filepath)
+filename = filepath * "/ssl_dimer"
+
+# Write all the files in the default format
+write_to_file(output_dict, filename)
 
 
 # TODO: Deal with single site multiplicity in here this could be put anywhere tbh
