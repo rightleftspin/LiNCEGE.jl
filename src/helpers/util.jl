@@ -3,7 +3,6 @@ General utility functions for a variety of parts of the NLCE process, these
 will generally be math heavy functions that are used often
 """
 
-
 using Distances
 using LinearAlgebra
 using Plots
@@ -54,7 +53,7 @@ function generate_cartesian_coordinates(dimension, half_side_length)
     coords
 end
 
-function full_adj_matrices(coords, neighbor_distances, colors)
+function full_adj_matrices(coords, neighbor_distances, colors, rev_connections, connections)
     num_coords = size(coords)[2]
     adj_mats = zeros(Int, 2, num_coords, num_coords)
     # Generates pairwise distances between all coordinates
@@ -63,18 +62,22 @@ function full_adj_matrices(coords, neighbor_distances, colors)
 
     for (i, coordi) in enumerate(eachcol(coords))
         for (j, coordj) in enumerate(eachcol(coords))
-            for (index_distance, distance) in enumerate(neighbor_distances)
-                if isapprox(dist_matrix[i, j], distance)
-                    adj_mats[1, i, j] = index_distance
-                    direction = coordi - coordj
-                    if findfirst(≈(direction), directions) != nothing
-                        adj_mats[2, i, j] = findfirst(≈(direction), directions)
-                    else
-                        push!(directions, direction)
-                        adj_mats[2, i, j] = findfirst(≈(direction), directions)
+#        allowed_neighbors = collect(Iterators.flatten(connections[rev_connections[i]]))
+#        for (j, coordj) in zip(allowed_neighbors, eachcol(coords)[allowed_neighbors])
+        #    if (j in collect(Iterators.flatten(connections[rev_connections[i]])))
+                for (index_distance, distance) in enumerate(neighbor_distances)
+                    if isapprox(dist_matrix[i, j], distance)
+                        adj_mats[1, i, j] = index_distance
+                        direction = coordi - coordj
+                        if findfirst(≈(direction), directions) != nothing
+                            adj_mats[2, i, j] = findfirst(≈(direction), directions)
+                        else
+                            push!(directions, direction)
+                            adj_mats[2, i, j] = findfirst(≈(direction), directions)
+                        end
                     end
                 end
-            end
+         #   end
         end
     end
 
@@ -90,8 +93,10 @@ function adj_list(coords, neighbor_distances)
     for i in 1:num_coords
         temp_adj_list::Vector{Int} = []
         for j in 1:num_coords
-            if (!(dists[i, j] > maximum(neighbor_distances)) && (dists[i, j] > 0))
-                append!(temp_adj_list, j)
+            for d in neighbor_distances
+                if (dists[i, j] ≈ d)
+                    append!(temp_adj_list, j)
+                end
             end
         end
         push!(adj_list, temp_adj_list)
@@ -102,25 +107,31 @@ end
 
 function hashing_lattice_coords(real_space_coords, expansion_sublattice_coords, struct_per_basis, colors)
     sub_coords = []
-    connection::Vector{Vector{Int64}} = []
+    connection::Vector{Vector{Int}} = []
+    rev_connection::Vector{Vector{Int}} = []
     all_colors = []
 
-    for (exp_coord, r_coord) in zip(eachcol(expansion_sublattice_coords), eachcol(real_space_coords))
+    for (ind_exp, exp_coord, r_coord) in zip(1:length(eachcol(expansion_sublattice_coords)), eachcol(expansion_sublattice_coords),
+                                    eachcol(real_space_coords))
         temp_connection = []
-        for (ind, sub_coord) in enumerate([per_basis + r_coord for per_basis in struct_per_basis[exp_coord[end]]])
+        for (ind, sub_coord) in enumerate([per_basis + r_coord
+                                           for per_basis in
+                                               struct_per_basis[exp_coord[end]]])
             sub_coord_loc = findfirst(≈(sub_coord), sub_coords)
             if sub_coord_loc != nothing
                 append!(temp_connection, sub_coord_loc)
+                append!(rev_connection[sub_coord_loc], ind_exp)
             else
                 push!(sub_coords, sub_coord)
                 push!(all_colors, colors[exp_coord[end]][ind])
                 append!(temp_connection, length(sub_coords))
+                push!(rev_connection, [ind_exp])
             end
         end
         push!(connection, temp_connection)
     end
 
-    (reduce(hcat, sub_coords), connection, all_colors)
+    (reduce(hcat, sub_coords), connection, rev_connection, all_colors)
 end
 
 """
@@ -219,7 +230,7 @@ function reindex_adj_list(underlying_adj_list::AbstractVector{<:AbstractVector{<
     end
 end
 
-# TODO: Fix this omg it is so slow
+# TODO: Fix this omg it is so slow, try pairwise distance
 """
 Finds a permutation representation of a given group of transformations
 on the given coordinates. 
@@ -255,13 +266,3 @@ function find_permutations(coordinates, group, shifts)
     
     permutations
 end
-
-"""
-Resummation functions that take in thermodynamic properties
-and return the resummed versions at various levels of correction.
-
-NOTE: Please make sure to use at least two resummation techniques as
-they will diverge at a further point than the bare NLCE summation.
-This divergence between the resummation should be treated as the new
-point to which the data is reasonable.
-"""

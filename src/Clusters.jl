@@ -137,13 +137,16 @@ function Cluster(
     exp_coords = add_basis_coords(expansion_basis, lattice)
     exp_sublattice_coords = add_basis_sublattice(expansion_basis, unrotated_lattice)
 
-    coords, connections, colors = hashing_lattice_coords(exp_coords,
+    coords, connections, rev_connections, colors = hashing_lattice_coords(exp_coords,
                                                          exp_sublattice_coords,
                                                          struct_per_basis,
                                                          basis_colors)
 
-    exp_adj_list = adj_list(coords, expansion_neighbors)
-    adj_matrices, dist_matrix = full_adj_matrices(coords, neighbors, colors)
+    #println(rev_connections)
+    exp_adj_list = adj_list(exp_coords, expansion_neighbors)
+    #println(exp_adj_list)
+    adj_matrices, dist_matrix = full_adj_matrices(coords, neighbors, colors, rev_connections, connections)
+    #println(adj_matrices[1,:,:])
     start_points = findfirst.(isapprox.(expansion_basis), (eachcol(exp_coords), ))
 
     Cluster(
@@ -167,8 +170,6 @@ function Cluster(
     underlying_super_vertices::AbstractVector{<:Integer},
     ) where {V, E}
     underlying_vertices = all_vertices(underlying_cluster, underlying_super_vertices)
-    # Need to reindex the coordinate bundle here, this is more complex than
-    # expected
     Cluster(
         coordinates(underlying_cluster, underlying_vertices),
         # This points to the cluster bundle, not the regular adjacency list!

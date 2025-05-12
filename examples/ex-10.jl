@@ -47,6 +47,11 @@ println("clusters")
 iso_clusters = NLCE.prune(NLCE.isomorphic_pruning, Set(generated_clusters))
 println("iso")
 
+#for (hash, cluster_info) in iso_clusters
+#    if NLCE.nv(cluster_info[1]) > 1
+#        iso_clusters[hash] = (cluster_info[1], cluster_info[2] // 4, cluster_info[3])
+#    end
+#end
 
 propogated = NLCE.propogate(NLCE.isomorphic_pruning, iso_clusters)
 println("propogated")
