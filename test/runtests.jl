@@ -30,7 +30,7 @@ using NLCE, Test
             square_nlce_bundle,
             length(NLCE.start(square_nlce_bundle)),
             t_i_clusters,
-            super_verts
+            super_verts,
         )
 
         @test sum([mult for (hash, (_, mult, _, _, _)) in square_lattice_cluster_info]) == sum(sum_lc_clusters_square[1:max_order])
@@ -71,7 +71,7 @@ using NLCE, Test
             triangular_nlce_bundle,
             length(NLCE.start(triangular_nlce_bundle)),
             t_i_clusters,
-            super_verts
+            super_verts,
         )
 
         @test sum([
@@ -115,7 +115,7 @@ using NLCE, Test
             kagome_nlce_bundle,
             length(NLCE.start(kagome_nlce_bundle)),
             t_i_clusters,
-            super_verts
+            super_verts,
         )
 
 
@@ -129,12 +129,14 @@ using NLCE, Test
 
     @testset "Square Lattice Cluster Expansion" begin
 
-        square_lattice = Dict("Expansion Basis" => [[1/2, 1/2]],
-                              "Struct Per Basis" => [[[-1/2, -1/2], [-1/2, 1/2], [1/2, -1/2], [1/2, 1/2]]],
-                              "Expansion Labels" => [[1, 2, 2, 1]],
-                              "Expansion Primitive Vectors" => [[1, 1], [1, -1]],
-                              "Expansion Neighbors" => [sqrt(2)],
-                              )
+        square_lattice = Dict(
+            "Expansion Basis" => [[1/2, 1/2]],
+            "Struct Per Basis" =>
+                [[[-1/2, -1/2], [-1/2, 1/2], [1/2, -1/2], [1/2, 1/2]]],
+            "Expansion Labels" => [[1, 2, 2, 1]],
+            "Expansion Primitive Vectors" => [[1, 1], [1, -1]],
+            "Expansion Neighbors" => [sqrt(2)],
+        )
 
         # Counts according to Rigol, Bryant and Singh 2007
         num_topo_clusters_square = [1, 1, 1, 2, 5, 11]
@@ -158,20 +160,20 @@ using NLCE, Test
         t_i_clusters, super_verts = NLCE.initial_clusters(
             square_nlce_bundle,
             (length(unique(Iterators.flatten(square_lattice["Expansion Labels"])))),
-            single_site =true,
+            single_site = true,
         )
 
         square_lattice_cluster_info = NLCE.lattice_constants!(
             square_nlce_bundle,
             (length(unique(Iterators.flatten(square_lattice["Expansion Labels"])))),
             t_i_clusters,
-            super_verts
+            super_verts,
         )
 
         # Because counting starts at 0, we have to check from the first count to the max_order + 1 count
-        @test sum([mult for (hash, (_, mult, _, _, _)) in square_lattice_cluster_info]) == sum(sum_lc_clusters_square[1:(max_order  + 1)])
+        @test sum([mult for (hash, (_, mult, _, _, _)) in square_lattice_cluster_info]) == sum(sum_lc_clusters_square[1:(max_order+1)])
         @test length(square_lattice_cluster_info) ==
-              sum(num_topo_clusters_square[1:(max_order + 1)])
+              sum(num_topo_clusters_square[1:(max_order+1)])
 
         # TODO: Write tests for subcluster multiplicities
 
@@ -179,12 +181,14 @@ using NLCE, Test
 
     @testset "Triangular Lattice Cluster Expansion" begin
 
-        triangular_lattice = Dict("Expansion Basis" => [[1/2, sqrt(3)/4]],
-                              "Struct Per Basis" => [[[-1/2, -sqrt(3)/4], [1/2, -sqrt(3)/4], [0, sqrt(3)/4]]],
-                              "Expansion Labels" => [[1, 1, 1]],
-                              "Expansion Primitive Vectors" => [[1, 0], [1/2, sqrt(3)/2]],
-                              "Expansion Neighbors" => [1],
-                              )
+        triangular_lattice = Dict(
+            "Expansion Basis" => [[1/2, sqrt(3)/4]],
+            "Struct Per Basis" =>
+                [[[-1/2, -sqrt(3)/4], [1/2, -sqrt(3)/4], [0, sqrt(3)/4]]],
+            "Expansion Labels" => [[1, 1, 1]],
+            "Expansion Primitive Vectors" => [[1, 0], [1/2, sqrt(3)/2]],
+            "Expansion Neighbors" => [1],
+        )
 
         # Counts according to Rigol, Bryant and Singh 2007
         num_topo_clusters_triangular = [1, 1, 1, 3, 5, 12, 35, 98, 299]
@@ -205,24 +209,19 @@ using NLCE, Test
             NLCE.isomorphic_pruning,
         )
 
-        t_i_clusters, super_verts = NLCE.initial_clusters(
-            triangular_nlce_bundle,
-            3,
-            single_site =true,
-        )
+        t_i_clusters, super_verts =
+            NLCE.initial_clusters(triangular_nlce_bundle, 3, single_site = true)
 
-        triangular_lattice_cluster_info = NLCE.lattice_constants!(
-            triangular_nlce_bundle,
-            3,
-            t_i_clusters,
-            super_verts
-        )
+        triangular_lattice_cluster_info =
+            NLCE.lattice_constants!(triangular_nlce_bundle, 3, t_i_clusters, super_verts)
 
 
         # Because counting starts at 0, we have to check from the first count to the max_order + 1 count
-        @test sum([mult for (hash, (_, mult, _, _, _)) in triangular_lattice_cluster_info]) == sum(sum_lc_clusters_triangular[1:(max_order  + 1)])
+        @test sum([
+            mult for (hash, (_, mult, _, _, _)) in triangular_lattice_cluster_info
+        ]) == sum(sum_lc_clusters_triangular[1:(max_order+1)])
         @test length(triangular_lattice_cluster_info) ==
-              sum(num_topo_clusters_triangular[1:(max_order + 1)])
+              sum(num_topo_clusters_triangular[1:(max_order+1)])
 
         # TODO: Write tests for subcluster multiplicities
 
@@ -230,12 +229,16 @@ using NLCE, Test
 
     @testset "Kagome Lattice Cluster Expansion" begin
 
-        kagome_lattice = Dict("Expansion Basis" => [[0, sqrt(3)/3], [0, -sqrt(3)/3]],
-                              "Struct Per Basis" => [[[0, -sqrt(3)/3], [1/2, sqrt(3)/6], [-1/2, sqrt(3)/6]], [[0, sqrt(3)/3], [1/2, -sqrt(3)/6], [-1/2, -sqrt(3)/6]]],
-                              "Expansion Labels" => [[1, 2, 3], [1, 3, 2]],
-                              "Expansion Primitive Vectors" => [[1, sqrt(3)], [1, -sqrt(3)]],
-                              "Expansion Neighbors" => [2 * sqrt(3)/3],
-                              )
+        kagome_lattice = Dict(
+            "Expansion Basis" => [[0, sqrt(3)/3], [0, -sqrt(3)/3]],
+            "Struct Per Basis" => [
+                [[0, -sqrt(3)/3], [1/2, sqrt(3)/6], [-1/2, sqrt(3)/6]],
+                [[0, sqrt(3)/3], [1/2, -sqrt(3)/6], [-1/2, -sqrt(3)/6]],
+            ],
+            "Expansion Labels" => [[1, 2, 3], [1, 3, 2]],
+            "Expansion Primitive Vectors" => [[1, sqrt(3)], [1, -sqrt(3)]],
+            "Expansion Neighbors" => [2 * sqrt(3)/3],
+        )
 
         # Counts according to Rigol, Bryant and Singh 2007
         num_topo_clusters_kagome = [1, 1, 1, 1, 2, 2, 5, 7, 15]
@@ -259,20 +262,20 @@ using NLCE, Test
         t_i_clusters, super_verts = NLCE.initial_clusters(
             kagome_nlce_bundle,
             (length(unique(Iterators.flatten(kagome_lattice["Expansion Labels"])))),
-            single_site =true,
+            single_site = true,
         )
 
         kagome_lattice_cluster_info = NLCE.lattice_constants!(
             kagome_nlce_bundle,
             (length(unique(Iterators.flatten(kagome_lattice["Expansion Labels"])))),
             t_i_clusters,
-            super_verts
+            super_verts,
         )
 
         # Because counting starts at 0, we have to check from the first count to the max_order + 1 count
-        @test sum([mult for (hash, (_, mult, _, _, _)) in kagome_lattice_cluster_info]) == sum(sum_lc_clusters_kagome[1:(max_order  + 1)])
+        @test sum([mult for (hash, (_, mult, _, _, _)) in kagome_lattice_cluster_info]) == sum(sum_lc_clusters_kagome[1:(max_order+1)])
         @test length(kagome_lattice_cluster_info) ==
-              sum(num_topo_clusters_kagome[1:(max_order + 1)])
+              sum(num_topo_clusters_kagome[1:(max_order+1)])
 
         # TODO: Write tests for subcluster multiplicities
 
@@ -280,14 +283,16 @@ using NLCE, Test
 
     @testset "Pyrochlore Lattice Tetrahedra Expansion" begin
 
-        pyrochlore_lattice = Dict("Expansion Basis" => [[-1/2, -1/2, -1/2], [1/2, 1/2, 1/2]],
-                              "Struct Per Basis" => [[[1/2, 1/2, 1/2], [1/2, -1/2, -1/2], [-1/2, 1/2, -1/2], [-1/2, -1/2, 1/2]],
-                                                     [[-1/2, -1/2, -1/2], [-1/2, 1/2, 1/2], [1/2, -1/2, 1/2], [1/2, 1/2, -1/2]],
-                                                    ],
-                              "Expansion Labels" => [[1, 2, 3, 4], [1, 2, 3, 4]],
-                              "Expansion Primitive Vectors" => [[2, 2, 0], [2, 0, 2], [0, 2, 2]],
-                              "Expansion Neighbors" => [sqrt(3)],
-                              )
+        pyrochlore_lattice = Dict(
+            "Expansion Basis" => [[-1/2, -1/2, -1/2], [1/2, 1/2, 1/2]],
+            "Struct Per Basis" => [
+                [[1/2, 1/2, 1/2], [1/2, -1/2, -1/2], [-1/2, 1/2, -1/2], [-1/2, -1/2, 1/2]],
+                [[-1/2, -1/2, -1/2], [-1/2, 1/2, 1/2], [1/2, -1/2, 1/2], [1/2, 1/2, -1/2]],
+            ],
+            "Expansion Labels" => [[1, 2, 3, 4], [1, 2, 3, 4]],
+            "Expansion Primitive Vectors" => [[2, 2, 0], [2, 0, 2], [0, 2, 2]],
+            "Expansion Neighbors" => [sqrt(3)],
+        )
 
         # Counts according to Schäfer et al. 2020
         num_topo_clusters_pyrochlore = [1, 1, 1, 1, 2, 3, 6, 10, 24, 49]
@@ -312,20 +317,22 @@ using NLCE, Test
         t_i_clusters, super_verts = NLCE.initial_clusters(
             pyrochlore_nlce_bundle,
             (length(unique(Iterators.flatten(pyrochlore_lattice["Expansion Labels"])))),
-            single_site =true,
+            single_site = true,
         )
 
         pyrochlore_lattice_cluster_info = NLCE.lattice_constants!(
             pyrochlore_nlce_bundle,
             (length(unique(Iterators.flatten(pyrochlore_lattice["Expansion Labels"])))),
             t_i_clusters,
-            super_verts
+            super_verts,
         )
 
         # Because counting starts at 0, we have to check from the first count to the max_order + 1 count
-        @test sum([mult for (hash, (_, mult, _, _, _)) in pyrochlore_lattice_cluster_info]) == sum(sum_lc_clusters_pyrochlore[1:(max_order  + 1)])
+        @test sum([
+            mult for (hash, (_, mult, _, _, _)) in pyrochlore_lattice_cluster_info
+        ]) == sum(sum_lc_clusters_pyrochlore[1:(max_order+1)])
         @test length(pyrochlore_lattice_cluster_info) ==
-              sum(num_topo_clusters_pyrochlore[1:(max_order + 1)])
+              sum(num_topo_clusters_pyrochlore[1:(max_order+1)])
 
         # TODO: Write tests for subcluster multiplicities
 
@@ -333,12 +340,18 @@ using NLCE, Test
 
     @testset "Pyrochlore Lattice Unit Cell Expansion" begin
 
-        pyrochlore_lattice = Dict("Expansion Basis" => [[0, 0, 0]],
-                              "Struct Per Basis" => [[[1/2, 1/2, 1/2], [1/2, -1/2, -1/2], [-1/2, 1/2, -1/2], [-1/2, -1/2, 1/2]]],
-                              "Expansion Labels" => [[1, 2, 3, 4]],
-                              "Expansion Primitive Vectors" => [[2, 2, 0], [2, 0, 2], [0, 2, 2]],
-                              "Expansion Neighbors" => [2 * sqrt(2)],
-                              )
+        pyrochlore_lattice = Dict(
+            "Expansion Basis" => [[0, 0, 0]],
+            "Struct Per Basis" => [[
+                [1/2, 1/2, 1/2],
+                [1/2, -1/2, -1/2],
+                [-1/2, 1/2, -1/2],
+                [-1/2, -1/2, 1/2],
+            ]],
+            "Expansion Labels" => [[1, 2, 3, 4]],
+            "Expansion Primitive Vectors" => [[2, 2, 0], [2, 0, 2], [0, 2, 2]],
+            "Expansion Neighbors" => [2 * sqrt(2)],
+        )
 
         # Counts according to Schäfer et al. 2020
         num_topo_clusters_pyrochlore = [1, 1, 1, 3, 8, 25, 100, 466, 2473]
@@ -361,19 +374,19 @@ using NLCE, Test
         t_i_clusters, super_verts = NLCE.initial_clusters(
             pyrochlore_nlce_bundle,
             (length(unique(Iterators.flatten(pyrochlore_lattice["Expansion Labels"])))),
-            single_site =true,
+            single_site = true,
         )
 
         pyrochlore_lattice_cluster_info = NLCE.lattice_constants!(
             pyrochlore_nlce_bundle,
             (length(unique(Iterators.flatten(pyrochlore_lattice["Expansion Labels"])))),
             t_i_clusters,
-            super_verts
+            super_verts,
         )
 
         # Because counting starts at 0, we have to check from the first count to the max_order + 1 count
         @test length(pyrochlore_lattice_cluster_info) ==
-              sum(num_topo_clusters_pyrochlore[1:(max_order + 1)])
+              sum(num_topo_clusters_pyrochlore[1:(max_order+1)])
 
         # TODO: Write tests for subcluster multiplicities
 

@@ -20,7 +20,11 @@ end
 
 begin # Individual Cluster Methods
     # TODO: Get cluster coordinates
-    function get_coordinates(bundle::AbstractBundle, cluster::Cluster) end
+    function get_coordinates(bundle::AbstractBundle, cluster::Cluster)
+        # act the permutation to get you to the new cluster, since
+        #it may be permuted
+
+    end
     # TODO: plot a cluster and plot a lattice here
 end
 
@@ -46,7 +50,7 @@ begin # NLCE methods
         bundle::AbstractBundle,
         per_site_factor::Integer,
         t_i_clusters,
-        super_vertices
+        super_vertices,
     )
         cluster_info = lattice_constants(
             hashing_fxn(bundle),
@@ -72,7 +76,11 @@ begin # NLCE methods
                 mult,
                 perm,
                 svs,
-                lattice_constants_only_info(hash_fxn, 1, find_subclusters(cluster, single_site)...),
+                lattice_constants_only_info(
+                    hash_fxn,
+                    1,
+                    find_subclusters(cluster, single_site)...,
+                ),
             )
         end
 

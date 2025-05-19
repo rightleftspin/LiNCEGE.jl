@@ -4,6 +4,7 @@ using LinearAlgebra
 using Distances
 using Rotations
 using NautyGraphs
+using JSON3 
 
 # Add the relevant structs
 include("Clusters.jl")
@@ -17,11 +18,17 @@ include("hashing.jl")
 
 # Add the relevant helper functions
 include("util.jl")
-include("writers.jl")
+include("wrappers.jl")
 
 # Add Ising Model Simulation
 include("ising.jl")
 
-export SiteExpansionBundle, StrongClusterExpansionBundle
+export SiteExpansionBundle,
+    StrongClusterExpansionBundle,
+    WeakClusterExpansionBundle,
+    site_expansion_NLCE,
+    simple_NLCE,
+    write_to_file,
+    write_to_file_fortran
 
 end

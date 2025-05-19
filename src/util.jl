@@ -426,7 +426,13 @@ function translationally_invariant_clusters(
             trans_invar_clusters,
             repeat(
                 [(
-                  Cluster([Int64[]], Vector{Vector{Int}}(), [1; 1; 1;;;], vertex_labeled(trans_invar_clusters[1][1]), edge_labeled(trans_invar_clusters[1][1])),
+                    Cluster(
+                        [Int64[]],
+                        Vector{Vector{Int}}(),
+                        [1; 1; 1;;;],
+                        vertex_labeled(trans_invar_clusters[1][1]),
+                        edge_labeled(trans_invar_clusters[1][1]),
+                    ),
                     [1],
                 )],
                 per_site_factor,
@@ -459,22 +465,19 @@ function lattice_constants(hashing_fxn, per_site_factor::Integer, clusters, supe
     cluster_info
 end
 
-function lattice_constants_only_info(hashing_fxn, per_site_factor::Integer, clusters, super_vertices)
+function lattice_constants_only_info(
+    hashing_fxn,
+    per_site_factor::Integer,
+    clusters,
+    super_vertices,
+)
     # (hash, (Cluster, Multiplicity, Permutation, super_vertices, subclusters(to be filled later)))
     cluster_info = Dict{UInt,Rational{Int}}()
-    add_mult_one =
-        (mult) ->
-            (mult + (1 // per_site_factor))
+    add_mult_one = (mult) -> (mult + (1 // per_site_factor))
 
     for (ind, (hash, permutation)) in enumerate(hashing_fxn.(clusters))
 
-        cluster_info[hash] = add_mult_one(
-            get(
-                cluster_info,
-                hash,
-                0,
-            )...,
-        )
+        cluster_info[hash] = add_mult_one(get(cluster_info, hash, 0)...)
 
     end
 
@@ -684,10 +687,10 @@ order, from the weights returned by LINCEGE
 function bincoeff(n, k)
     r = 1
     if (k > n)
-      return 0
+        return 0
     end
 
-    for d in 1:k
+    for d = 1:k
         r = r * n / d
         n -= 1
     end
@@ -699,28 +702,27 @@ function break_properties(properties)
     broken_props = zero(properties)
     broken_props[:, :, 1] = properties[:, :, 1]
 
-    for i in 2:size(properties, 3)
-        broken_props[:, :, i] = properties[:, :, i] - properties[:, :, i - 1]
+    for i = 2:size(properties, 3)
+        broken_props[:, :, i] = properties[:, :, i] - properties[:, :, i-1]
     end
 
     broken_props
 end
 
 function euler_resummation(properties, start)
-    broken_props = break_properties(properties[:, :, 1:(end - 2)])
+    broken_props = break_properties(properties[:, :, 1:(end-2)])
     partial_prop = broken_props[:, :, start:end]
     out = zero(partial_prop)
-    for i in 1:size(partial_prop, 3)
+    for i = 1:size(partial_prop, 3)
         delta = zero(partial_prop[:, :, 1])
-        for j in 1:i
+        for j = 1:i
             coeff = bincoeff(i, j)
-            delta += (-1) ^ (j) * coeff .*
-                abs.(partial_prop[:, :, j])
+            delta += (-1) ^ (j) * coeff .* abs.(partial_prop[:, :, j])
         end
         out[:, :, i] += (0.5 ^ (i + 1)) .* delta
     end
 
-    (sum(out, dims=3) + properties[:, :, start - 1])
+    (sum(out, dims = 3) + properties[:, :, start-1])
 end
 
 function eps_wynn(k, n, properties)
@@ -740,4 +742,96 @@ function wynn_resummation(properties, wynn_cycles)
     final_order = size(properties, 3)
 
     eps_wynn((2 * wynn_cycles), final_order - (2 * wynn_cycles), properties)
+end
+
+"""
+These are writers that write a set of clusters to a file for future use. There are many styles
+of writing to disk, but the standard will be JSON files
+"""
+
+function write_to_file(
+    nlce_output::AbstractDict{<:Cluster,Vector{<:Real}},
+    bundle::AbstractBundle,
+    filename::AbstractString,
+)
+    clusters = []
+    for (cluster, mults) in nlce_output
+        cluster_dict = Dict()
+        cluster_dict["NLCE Order"] = nsv(cluster)
+        cluster_dict["Number of Sites"] = nv(cluster)
+        cluster_dict["Site Labels"] = all_vertex_labels(cluster)
+        # TODO: cluster_dict["coordinates"] = get_coordinates(bundle, cluster)
+        cluster_dict["Weighted Bonds"] = weighted_edge_list(cluster)
+        cluster_dict["Multiplicities"] = mults
+
+        push!(clusters, cluster_dict)
+    end
+
+    open(filename, "w") do io
+        JSON3.pretty(io, clusters)
+    end
+end
+
+"""
+Fortran format specifies for each cluster the number of bonds. Then it has each
+bond listed below it in its own line, tab spaced. Between each cluster, there is
+an empty line and at the end of the file is multiplicity for each cluster at
+every order. For example, with a maximum order of 4 on a square lattice,
+the file for the clusters of order 3 would look like this:
+
+start of file >>>
+2
+1	2	1
+1	3	1
+
+0 0 6 -38
+<<< end of file
+
+Here there is only one cluster, it has 2 bonds. The bonds connect
+vertices 1 and 2, and vertices 1 and 3 both with weight 1. The cluster
+has overall multiplicity 0 for both order 1 and 2, multiplicity 6 for
+order 3 and -38 for order 4.
+
+A general example would look like this:
+
+start of file >>>
+number_of_bonds
+vertex1 vertex2 bond_weight
+vertex1 vertex3 bond_weight
+...
+
+number_of_bonds
+vertex1 vertex2 bond_weight
+vertex1 vertex3 bond_weight
+...
+
+multiplicity_1 multiplicity_2 ...
+multiplicity_1 multiplicity_2 ...
+...
+<<< end of file
+"""
+function write_to_file_fortran(
+    nlce_output::AbstractDict{<:Cluster,Vector{<:Real}},
+    bundle::AbstractBundle,
+    filename::AbstractString,
+    max_order::Integer,
+)
+
+    nlce_files = [open(filename * "_$(i).txt", "w") for i = 1:max_order]
+    sorted_clusters = sort(collect(keys(nlce_output)), by = nv)
+
+    for cluster in sorted_clusters
+        edges = weighted_edge_list(cluster)
+        write(nlce_files[nv(cluster)], "$(length(edges))\n")
+        for edge in edges
+            write(nlce_files[nv(cluster)], "$(join(edge, '\t'))\n")
+        end
+        write(nlce_files[nv(cluster)], "\n")
+    end
+
+    for cluster in sorted_clusters
+        write(nlce_files[nv(cluster)], "$(join(nlce_output[cluster], ' '))\n")
+    end
+
+    close.(nlce_files)
 end
