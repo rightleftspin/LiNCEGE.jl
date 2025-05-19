@@ -25,7 +25,7 @@ begin # Individual Cluster Methods
 end
 
 begin # NLCE methods
-    function lattice_constants!(
+    function initial_clusters(
         bundle::AbstractBundle,
         per_site_factor::Integer;
         single_site::Bool = false,
@@ -39,6 +39,15 @@ begin # NLCE methods
             per_site_factor,
         )
 
+        (t_i_clusters, super_vertices)
+    end
+
+    function lattice_constants!(
+        bundle::AbstractBundle,
+        per_site_factor::Integer,
+        t_i_clusters,
+        super_vertices
+    )
         cluster_info = lattice_constants(
             hashing_fxn(bundle),
             per_site_factor,
@@ -46,8 +55,10 @@ begin # NLCE methods
             super_vertices,
         )
 
+
         set_cluster_info!(bundle, cluster_info)
     end
+
 
     function subclusters!(
         bundle::AbstractBundle,

@@ -15,8 +15,9 @@ kagome_lattice = Dict("Expansion Basis" => [[0, sqrt(3)/3], [0, -sqrt(3)/3]],
                               )
 
 neighbors = [1]
-max_order = 8
+max_order = 12
 
+@time begin
 kagome_nlce_bundle = NLCE.WeakClusterExpansionBundle(
     kagome_lattice["Expansion Basis"],
     kagome_lattice["Struct Per Basis"],
@@ -27,16 +28,23 @@ kagome_nlce_bundle = NLCE.WeakClusterExpansionBundle(
     max_order,
     NLCE.isomorphic_pruning,
 )
+end
 
+@time begin
 kagome_lattice_cluster_info = NLCE.lattice_constants!(
     kagome_nlce_bundle,
     (length(unique(Iterators.flatten(kagome_lattice["Expansion Labels"])))),
     single_site=true,
 )
+end
 
+@time begin
 NLCE.subclusters!(kagome_nlce_bundle, true)
+end
 
+@time begin
 final_weights = NLCE.final_clusters(kagome_nlce_bundle, true)
+end
 
 num_sites = []
 bond_lists = []

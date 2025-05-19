@@ -10,8 +10,9 @@ using JLD
 square_lattice = Dict("Basis" => [[0, 0]], "Primitive Vectors" => [[1, 0], [0, 1]])
 
 neighbors = [1]
-max_order = 8
+max_order = 12
 
+@time begin
 square_nlce_bundle = NLCE.SiteExpansionBundle(
     square_lattice["Basis"],
     square_lattice["Primitive Vectors"],
@@ -19,15 +20,20 @@ square_nlce_bundle = NLCE.SiteExpansionBundle(
     max_order,
     NLCE.isomorphic_pruning,
 )
+end
 
 square_lattice_cluster_info = NLCE.lattice_constants!(
     square_nlce_bundle,
     length(NLCE.start(square_nlce_bundle)),
 )
 
+@time begin
 NLCE.subclusters!(square_nlce_bundle, false)
+end
 
-final_weights = NLCE.final_clusters(square_nlce_bundle)
+@time begin
+final_weights = NLCE.final_clusters(square_nlce_bundle, false)
+end
 
 num_sites = []
 bond_lists = []

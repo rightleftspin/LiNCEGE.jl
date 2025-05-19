@@ -4,8 +4,10 @@ authors = ["Pranav <pranav@myrdd.info>"]
 version = "0.1.0"
 
 [deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
 JLD = "4138dd39-2aa7-5051-a626-17a0bb65d9c8"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 NautyGraphs = "7509a0a4-015a-4167-b44b-0799a1a2605e"
+PkgBenchmark = "32113eaa-f34f-5b0d-bd6c-c81e245fc73d"
 Rotations = "6038ab10-8711-5258-84ad-4b1120ba62dc"

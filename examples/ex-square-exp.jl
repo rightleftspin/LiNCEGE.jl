@@ -15,7 +15,7 @@ square_lattice = Dict("Expansion Basis" => [[1/2, 1/2]],
                       )
 
 # Order starts a 0 for the single site, then goes up from there
-neighbors = [1]
+neighbors = [1, sqrt(2)]
 max_order = 6
 
 square_nlce_bundle = NLCE.WeakClusterExpansionBundle(

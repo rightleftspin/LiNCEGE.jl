@@ -21,9 +21,16 @@ using NLCE, Test
             NLCE.isomorphic_pruning,
         )
 
+        t_i_clusters, super_verts = NLCE.initial_clusters(
+            square_nlce_bundle,
+            length(NLCE.start(square_nlce_bundle)),
+        )
+
         square_lattice_cluster_info = NLCE.lattice_constants!(
             square_nlce_bundle,
             length(NLCE.start(square_nlce_bundle)),
+            t_i_clusters,
+            super_verts
         )
 
         @test sum([mult for (hash, (_, mult, _, _, _)) in square_lattice_cluster_info]) == sum(sum_lc_clusters_square[1:max_order])
@@ -55,9 +62,16 @@ using NLCE, Test
             NLCE.isomorphic_pruning,
         )
 
+        t_i_clusters, super_verts = NLCE.initial_clusters(
+            triangular_nlce_bundle,
+            length(NLCE.start(triangular_nlce_bundle)),
+        )
+
         triangular_lattice_cluster_info = NLCE.lattice_constants!(
             triangular_nlce_bundle,
             length(NLCE.start(triangular_nlce_bundle)),
+            t_i_clusters,
+            super_verts
         )
 
         @test sum([
@@ -92,10 +106,18 @@ using NLCE, Test
             NLCE.isomorphic_pruning,
         )
 
-        kagome_lattice_cluster_info = NLCE.lattice_constants!(
+        t_i_clusters, super_verts = NLCE.initial_clusters(
             kagome_nlce_bundle,
             length(NLCE.start(kagome_nlce_bundle)),
         )
+
+        kagome_lattice_cluster_info = NLCE.lattice_constants!(
+            kagome_nlce_bundle,
+            length(NLCE.start(kagome_nlce_bundle)),
+            t_i_clusters,
+            super_verts
+        )
+
 
         @test sum([mult for (hash, (_, mult, _, _, _)) in kagome_lattice_cluster_info]) == sum(sum_lc_clusters_kagome[1:max_order])
         @test length(kagome_lattice_cluster_info) ==
@@ -133,10 +155,17 @@ using NLCE, Test
             NLCE.isomorphic_pruning,
         )
 
-        square_lattice_cluster_info = NLCE.lattice_constants!(
+        t_i_clusters, super_verts = NLCE.initial_clusters(
             square_nlce_bundle,
             (length(unique(Iterators.flatten(square_lattice["Expansion Labels"])))),
             single_site =true,
+        )
+
+        square_lattice_cluster_info = NLCE.lattice_constants!(
+            square_nlce_bundle,
+            (length(unique(Iterators.flatten(square_lattice["Expansion Labels"])))),
+            t_i_clusters,
+            super_verts
         )
 
         # Because counting starts at 0, we have to check from the first count to the max_order + 1 count
@@ -176,11 +205,19 @@ using NLCE, Test
             NLCE.isomorphic_pruning,
         )
 
+        t_i_clusters, super_verts = NLCE.initial_clusters(
+            triangular_nlce_bundle,
+            3,
+            single_site =true,
+        )
+
         triangular_lattice_cluster_info = NLCE.lattice_constants!(
             triangular_nlce_bundle,
             3,
-            single_site=true,
+            t_i_clusters,
+            super_verts
         )
+
 
         # Because counting starts at 0, we have to check from the first count to the max_order + 1 count
         @test sum([mult for (hash, (_, mult, _, _, _)) in triangular_lattice_cluster_info]) == sum(sum_lc_clusters_triangular[1:(max_order  + 1)])
@@ -219,10 +256,17 @@ using NLCE, Test
             NLCE.isomorphic_pruning,
         )
 
+        t_i_clusters, super_verts = NLCE.initial_clusters(
+            kagome_nlce_bundle,
+            (length(unique(Iterators.flatten(kagome_lattice["Expansion Labels"])))),
+            single_site =true,
+        )
+
         kagome_lattice_cluster_info = NLCE.lattice_constants!(
             kagome_nlce_bundle,
             (length(unique(Iterators.flatten(kagome_lattice["Expansion Labels"])))),
-            single_site=true,
+            t_i_clusters,
+            super_verts
         )
 
         # Because counting starts at 0, we have to check from the first count to the max_order + 1 count
@@ -265,10 +309,17 @@ using NLCE, Test
             NLCE.isomorphic_pruning,
         )
 
+        t_i_clusters, super_verts = NLCE.initial_clusters(
+            pyrochlore_nlce_bundle,
+            (length(unique(Iterators.flatten(pyrochlore_lattice["Expansion Labels"])))),
+            single_site =true,
+        )
+
         pyrochlore_lattice_cluster_info = NLCE.lattice_constants!(
             pyrochlore_nlce_bundle,
             (length(unique(Iterators.flatten(pyrochlore_lattice["Expansion Labels"])))),
-            single_site=true,
+            t_i_clusters,
+            super_verts
         )
 
         # Because counting starts at 0, we have to check from the first count to the max_order + 1 count
@@ -307,10 +358,17 @@ using NLCE, Test
             NLCE.isomorphic_pruning,
         )
 
+        t_i_clusters, super_verts = NLCE.initial_clusters(
+            pyrochlore_nlce_bundle,
+            (length(unique(Iterators.flatten(pyrochlore_lattice["Expansion Labels"])))),
+            single_site =true,
+        )
+
         pyrochlore_lattice_cluster_info = NLCE.lattice_constants!(
             pyrochlore_nlce_bundle,
             (length(unique(Iterators.flatten(pyrochlore_lattice["Expansion Labels"])))),
-            single_site=true,
+            t_i_clusters,
+            super_verts
         )
 
         # Because counting starts at 0, we have to check from the first count to the max_order + 1 count

@@ -426,7 +426,7 @@ function translationally_invariant_clusters(
             trans_invar_clusters,
             repeat(
                 [(
-                    Cluster([Int64[]], Vector{Vector{Int}}(), [1; 1; 1;;;], false, false),
+                  Cluster([Int64[]], Vector{Vector{Int}}(), [1; 1; 1;;;], vertex_labeled(trans_invar_clusters[1][1]), edge_labeled(trans_invar_clusters[1][1])),
                     [1],
                 )],
                 per_site_factor,
