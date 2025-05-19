@@ -18,5 +18,3 @@ From here on out, you can just run
 julia --project=. examples/ex-1.jl
 
 or any other file in the repository.
-
-TODO: Shift the NLCE pipeline to be pure algorithms for future conversion to rust.
