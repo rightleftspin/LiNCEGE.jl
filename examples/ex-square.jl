@@ -14,7 +14,7 @@ primitive_vectors = [[1, 0], [0, 1]]
 # Nearest neighbors are just distance 1 away
 neighbors = [1]
 
-max_order = 8
+max_order = 12
 
 # Choosing site expansion since this is a lattice upon which we can
 # perform the site expansion

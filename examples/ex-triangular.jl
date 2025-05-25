@@ -16,7 +16,7 @@ primitive_vectors = [[0.5, sqrt(3) / 2], [1, 0]]
 neighbors = [1]
 
 # Setting the maximum order
-max_order = 6
+max_order = 9
 
 # Perform NLCE for this, use site expansion
 nlce_clusters, bundle = site_expansion_NLCE(basis, primitive_vectors, neighbors, max_order)
@@ -25,7 +25,7 @@ nlce_clusters, bundle = site_expansion_NLCE(basis, primitive_vectors, neighbors,
 # if it does not exist
 filepath = "examples/outputs/ex-triangular"
 mkpath(filepath)
-filename = filepath * "/triangular_nn_6.json"
+filename = filepath * "/triangular_nn_$(max_order).json"
 
 # Write all the files in the "fortran" format
 #write_to_file_fortran(nlce_clusters, bundle, filename, max_order)
