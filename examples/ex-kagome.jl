@@ -26,16 +26,13 @@ filename = filepath * "/kagome_nn_$(max_order).json"
 write_to_file(nlce_clusters, bundle, filename)
 
 kagome_lattice_cluster_expansion = Dict(
-    "Expansion Basis" => [[0, sqrt(3)/3], [0, -sqrt(3)/3]],
-    "Struct Per Basis" => [
-        [[0, -sqrt(3)/3], [1/2, sqrt(3)/6], [-1/2, sqrt(3)/6]],
-        [[0, sqrt(3)/3], [1/2, -sqrt(3)/6], [-1/2, -sqrt(3)/6]],
-    ],
-    "Expansion Labels" => [[1, 2, 3], [1, 3, 2]],
-    "Expansion Primitive Vectors" => [[1, sqrt(3)], [1, -sqrt(3)]],
-    "Expansion Neighbors" => [2 * sqrt(3)/3],
+        "Expansion Basis" => [[0, sqrt(3) / 3], [0, -sqrt(3) / 3]],
+        "Struct Per Basis" => [
+                [[0, -sqrt(3) / 3], [1 / 2, sqrt(3) / 6], [-1 / 2, sqrt(3) / 6]],
+                [[0, sqrt(3) / 3], [1 / 2, -sqrt(3) / 6], [-1 / 2, -sqrt(3) / 6]],
+        ],
+        "Expansion Labels" => [[1, 2, 3], [1, 3, 2]],
+        "Expansion Primitive Vectors" => [[1, sqrt(3)], [1, -sqrt(3)]],
+        "Expansion Neighbors" => [2 * sqrt(3) / 3],
 )
-
-
-
 end
