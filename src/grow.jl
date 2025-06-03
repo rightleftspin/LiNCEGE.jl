@@ -1,19 +1,121 @@
+using Graphs
+using DataStructures
+using StaticArrays
+
 begin # Growing functions to get subclusters from a cluster
 
-        mutable struct Frame{T}
-                subcluster::Vector{T}
-                neighbors::Set{T}
-                guard::Set{T}
-                iterator::Vector{T}
-                idx::Int
+        struct Subgraph{T<:Integer}
+                vertices::AbstractSet{T} # needs to be a sorted container since it is in order
+                neighbors::AbstractSet{T}
         end
 
-        """
-        The algorithm takes in a cluster and the order that subclusters should be generated till.
-        Using this information, the algorithm recursively generates an array of vertices that
-        are all subclusters of specified order or lower of the cluster.
-        """
+        function Subgraph(vertex::T, cluster::Cluster) where {T<:Integer}
+                Subgraph{T}(BitSet([vertex]), BitSet(neighbors(cluster, vertex)))
+        end
+
+        function neighbor_subgraphs(subgraph::Subgraph, cluster::Cluster)
+                neighbors = Vector{Subgraph}(undef, length(subgraph.neighbors))
+                neighbor_subgraphs!(subgraph, cluster, neighbors)
+        end
+
+        function neighbor_subgraphs!(subgraph, cluster, ns)
+                for (i, neighbor) in enumerate(subgraph.neighbors)
+                        new_vertices = union(subgraph.vertices, neighbor)
+                        new_neighbors = setdiff(union(subgraph.neighbors, neighbors(cluster, neighbor)), subgraph.vertices)
+                        ns[i] = Subgraph(new_vertices, new_neighbors)
+                end
+                ns
+        end
+
+        to_vector(subgraph::Subgraph) = collect(subgraph.vertices)
+        nodes(subgraph::Subgraph) = subgraph.vertices
+
+        Base.length(subgraph::Subgraph) = length(subgraph.vertices)
+
+        Base.hash(subgraph::Subgraph, h::UInt) = hash(subgraph.vertices, h)
+        Base.isequal(g1::Subgraph, g2::Subgraph) = (g1.vertices == g2.vertices)
+
+        function dfs_kernel!(dfs_lock::ReentrantLock, next::Stack{Subgraph}, cluster::Cluster, parents::AbstractSet{Subgraph}, max_order::Integer)
+
+                while true
+
+                        subgraph = nothing
+                        for i in 1:3
+                                lock(dfs_lock)
+                                if !isempty(next)
+                                        subgraph = pop!(next)
+                                        unlock(dfs_lock)
+                                        break
+                                end
+                                unlock(dfs_lock)
+                                if i == 3
+                                        println("Finished")
+                                        return
+                                end
+                                sleep(0.005)
+                        end
+
+
+                        if length(subgraph) < max_order
+                                filtered_subgraphs = filter(!in(parents), neighbor_subgraphs(subgraph, cluster))
+                                lock(dfs_lock)
+                                for fs in filtered_subgraphs
+                                        push!(parents, fs)
+                                        push!(next, fs)
+                                end
+                                unlock(dfs_lock)
+
+                                #for lower_subgraph in neighbor_subgraphs(subgraph, cluster)
+                                #        lock(dfs_lock)
+                                #        if !(lower_subgraph in parents)
+                                #                push!(parents, lower_subgraph)
+                                #                push!(next, lower_subgraph)
+                                #        end
+                                #        unlock(dfs_lock)
+                                #end
+                        end
+                end
+                println("Finished")
+        end
+
+        function dfs!(next::Stack{Subgraph}, cluster::Cluster, source::Subgraph, parents::AbstractSet{Subgraph}, max_order::Integer)
+
+                push!(next, source)
+                push!(parents, source)
+
+                dfs_lock = ReentrantLock()
+
+                Threads.@threads for i in 1:Threads.nthreads()
+                        println(i)
+                        dfs_kernel!(dfs_lock, next, cluster, parents, max_order)
+                end
+
+                parents
+        end
+
+        function grow_lower_site!(cluster::Cluster, parents::AbstractSet{Subgraph}, start::Integer, max_order::Integer)
+
+                root_subgraph = Subgraph(start, cluster)
+
+                next = Stack{Subgraph}()
+
+                dfs!(next, cluster, root_subgraph, parents, max_order)
+        end
+
+
         function grow_lower(cluster::Cluster, start::Vector{<:Integer}, max_order::Integer)
+
+                parents = Set{Subgraph}()
+
+                for vertex in start
+                        grow_lower_site!(cluster, parents, vertex, max_order)
+                end
+
+                println("here")
+                to_vector.(parents)
+        end
+
+        function grow_lower_rec(cluster::Cluster, start::Vector{<:Integer}, max_order::Integer)
 
                 out_array::Vector{Vector{Int}} = Vector()
                 guarding_set::Set{Int} = Set([])
@@ -41,7 +143,6 @@ begin # Growing functions to get subclusters from a cluster
 
                 out_array
         end
-
 
         """
         This is step one of the NLCE pipeline. The algorithm takes in
@@ -82,7 +183,7 @@ begin # Growing functions to get subclusters from a cluster
         Grows the subclusters from a specific site, up till specific order and outputs them into
         the out_array. This adds all subclusters at or below the given max_order.
         """
-        function _grow_from_site_lower_temp(
+        function _grow_from_site_lower(
                 cluster::Cluster,
                 max_order::Integer,
                 subcluster_vertices::AbstractVector{V},
@@ -137,65 +238,6 @@ begin # Growing functions to get subclusters from a cluster
                         end
                 end
                 return (has_int_leaf)
-        end
-
-        function _grow_from_site_lower(
-                cluster::Cluster,
-                max_order::Integer,
-                subcluster_vertices::AbstractVector{V},
-                current_neighbors::Set{V},
-                guarding_set::Set{V},
-                out_array::AbstractVector{<:AbstractVector{V}},
-        ) where {V<:Integer}
-
-                stack = Vector{Frame{V}}()
-                push!(stack, Frame(copy(subcluster_vertices), copy(current_neighbors), copy(guarding_set), collect(current_neighbors), 1))
-
-                has_int_leaf = false
-
-                while !isempty(stack)
-                        frame = stack[end]
-
-                        # Always record the current subcluster
-                        push!(out_array, deepcopy(frame.subcluster))
-
-                        if length(frame.subcluster) == max_order
-                                pop!(stack)
-                                has_int_leaf = true
-                                continue
-                        end
-
-                        if frame.idx > length(frame.iterator)
-                                pop!(stack)
-                                continue
-                        end
-
-                        neighbor = frame.iterator[frame.idx]
-                        frame.idx += 1
-
-                        new_subcluster = copy(frame.subcluster)
-                        push!(new_subcluster, neighbor)
-
-                        new_guard = copy(frame.guard)
-                        push!(new_guard, neighbor)
-
-                        new_neighbors = copy(frame.neighbors)
-                        delete!(new_neighbors, neighbor)
-
-                        for vertex in neighbors(cluster, neighbor)
-                                if !(vertex in new_subcluster) && !(vertex in new_guard) && !(vertex in new_neighbors)
-                                        push!(new_neighbors, vertex)
-                                end
-                        end
-
-                        if (nsv(cluster) - length(new_guard)) < max_order
-                                continue
-                        end
-
-                        push!(stack, Frame(new_subcluster, new_neighbors, new_guard, collect(new_neighbors), 1))
-                end
-
-                return has_int_leaf
         end
 
         """

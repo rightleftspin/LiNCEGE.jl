@@ -23,53 +23,53 @@ Output:
     hashmap containing clusters and their corresponding multiplicities
 """
 function site_expansion_NLCE(
-    basis::AbstractVector{<:AbstractVector{<:Real}},
-    primitive_vectors::AbstractVector{<:AbstractVector{<:Real}},
-    neighbors::AbstractVector{<:Real},
-    max_order::Integer;
-    basis_labels::AbstractVector{<:Integer} = repeat([1], length(basis)),
+        basis::AbstractVector{<:AbstractVector{<:Real}},
+        primitive_vectors::AbstractVector{<:AbstractVector{<:Real}},
+        neighbors::AbstractVector{<:Real},
+        max_order::Integer;
+        basis_labels::AbstractVector{<:Integer}=repeat([1], length(basis)),
 )
 
-    println("Setting up the lattice")
-    nlce_bundle = NLCE.SiteExpansionBundle(
-        basis,
-        primitive_vectors,
-        neighbors,
-        max_order,
-        NLCE.isomorphic_pruning,
-        basis_labels = basis_labels,
-    )
+        println("Setting up the lattice")
+        nlce_bundle = NLCE.SiteExpansionBundle(
+                basis,
+                primitive_vectors,
+                neighbors,
+                max_order,
+                NLCE.isomorphic_pruning,
+                basis_labels=basis_labels,
+        )
 
-    println("Finding all translationally distinct clusters")
-    t_i_clusters, super_verts =
-        NLCE.initial_clusters(nlce_bundle, length(NLCE.start(nlce_bundle)))
+        println("Finding all translationally distinct clusters")
+        t_i_clusters, super_verts =
+                NLCE.initial_clusters(nlce_bundle, length(NLCE.start(nlce_bundle)))
 
-    println("Reducing to topologically distinct clusters")
-    cluster_info = NLCE.lattice_constants!(
-        nlce_bundle,
-        length(NLCE.start(nlce_bundle)),
-        t_i_clusters,
-        super_verts,
-    )
-
-    println("Finding all subclusters")
-    NLCE.subclusters!(nlce_bundle, false)
-
-    println("Returning final NLCE weights")
-    (NLCE.final_clusters(nlce_bundle, false), nlce_bundle)
+        #        println("Reducing to topologically distinct clusters")
+        #        cluster_info = NLCE.lattice_constants!(
+        #                nlce_bundle,
+        #                length(NLCE.start(nlce_bundle)),
+        #                t_i_clusters,
+        #                super_verts,
+        #        )
+        #
+        #        println("Finding all subclusters")
+        #        NLCE.subclusters!(nlce_bundle, false)
+        #
+        #        println("Returning final NLCE weights")
+        #        (NLCE.final_clusters(nlce_bundle, false), nlce_bundle)
 end
 
 """
 Wrapper for backwards compat
 """
 function simple_NLCE(
-    basis::AbstractVector{<:AbstractVector{<:Real}},
-    primitive_vectors::AbstractVector{<:AbstractVector{<:Real}},
-    neighbors::AbstractVector{<:Real},
-    max_order::Integer;
-    basis_labels::AbstractVector{<:Integer} = repeat([1], length(basis)),
+        basis::AbstractVector{<:AbstractVector{<:Real}},
+        primitive_vectors::AbstractVector{<:AbstractVector{<:Real}},
+        neighbors::AbstractVector{<:Real},
+        max_order::Integer;
+        basis_labels::AbstractVector{<:Integer}=repeat([1], length(basis)),
 )
-    site_expansion_NLCE(basis, primitive_vectors, neighbors, max_order, basis_labels)
+        site_expansion_NLCE(basis, primitive_vectors, neighbors, max_order, basis_labels)
 
 end
 
@@ -82,49 +82,49 @@ Output:
     hashmap containing clusters and their corresponding multiplicities
 """
 function weak_cluster_expansion_NLCE(
-    expansion_basis::AbstractVector{<:AbstractVector{<:Real}},
-    struct_per_basis,
-    expansion_labels,
-    expansion_primitive_vectors::AbstractVector{<:AbstractVector{<:Real}},
-    expansion_neighbors,
-    neighbors::AbstractVector{<:Real},
-    per_site_factor::Integer,
-    max_order::Integer;
-    basis_labels::AbstractVector{<:AbstractVector{<:Integer}} = [
-        repeat([1], length(st)) for st in struct_per_basis
-    ],
-)
-
-    println("Setting up the lattice")
-    nlce_bundle = NLCE.WeakClusterExpansionBundle(
-        expansion_basis,
+        expansion_basis::AbstractVector{<:AbstractVector{<:Real}},
         struct_per_basis,
         expansion_labels,
-        expansion_primitive_vectors,
+        expansion_primitive_vectors::AbstractVector{<:AbstractVector{<:Real}},
         expansion_neighbors,
-        neighbors,
-        max_order,
-        NLCE.isomorphic_pruning,
-        basis_labels=basis_labels
-    )
+        neighbors::AbstractVector{<:Real},
+        per_site_factor::Integer,
+        max_order::Integer;
+        basis_labels::AbstractVector{<:AbstractVector{<:Integer}}=[
+                repeat([1], length(st)) for st in struct_per_basis
+        ],
+)
+
+        println("Setting up the lattice")
+        nlce_bundle = NLCE.WeakClusterExpansionBundle(
+                expansion_basis,
+                struct_per_basis,
+                expansion_labels,
+                expansion_primitive_vectors,
+                expansion_neighbors,
+                neighbors,
+                max_order,
+                NLCE.isomorphic_pruning,
+                basis_labels=basis_labels
+        )
 
 
-    println("Finding all translationally distinct clusters")
-    t_i_clusters, super_verts =
-        NLCE.initial_clusters(nlce_bundle, per_site_factor, single_site=true)
+        println("Finding all translationally distinct clusters")
+        t_i_clusters, super_verts =
+                NLCE.initial_clusters(nlce_bundle, per_site_factor, single_site=true)
 
-    println("Reducing to topologically distinct clusters")
-    cluster_info = NLCE.lattice_constants!(
-        nlce_bundle,
-        per_site_factor,
-        t_i_clusters,
-        super_verts,
-    )
+        println("Reducing to topologically distinct clusters")
+        cluster_info = NLCE.lattice_constants!(
+                nlce_bundle,
+                per_site_factor,
+                t_i_clusters,
+                super_verts,
+        )
 
-    println("Finding all subclusters")
-    NLCE.subclusters!(nlce_bundle, true)
+        println("Finding all subclusters")
+        NLCE.subclusters!(nlce_bundle, true)
 
-    println("Returning final NLCE weights")
-    (NLCE.final_clusters(nlce_bundle, true), nlce_bundle)
+        println("Returning final NLCE weights")
+        (NLCE.final_clusters(nlce_bundle, true), nlce_bundle)
 end
 
