@@ -1,4 +1,9 @@
-struct RealSpaceLattice{C<:AbstractMatrix,S<:AbstractMatrix{<:Integer},T<:AbstractVector{<:AbstractSet{<:Integer}},L<:AbstractVector{<:Integer}}
+struct RealSpaceLattice{
+        C<:AbstractMatrix,
+        S<:AbstractMatrix{<:Integer},
+        T<:AbstractVector{ExpansionVertices},
+        L<:AbstractVector{<:Integer},
+}
         coordinates::C
         labels::L
         translational_labels::L
@@ -6,7 +11,6 @@ struct RealSpaceLattice{C<:AbstractMatrix,S<:AbstractMatrix{<:Integer},T<:Abstra
 end
 
 function RealSpaceLattice(nlce_tiling::Tiling, max_order::Int)
-
 
 end
 

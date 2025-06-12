@@ -1,5 +1,5 @@
 
-struct BondCluster{V<:AbstractSet{<:Unsigned},H<:Unsigned} <: AbstractCluster
+struct BondCluster{V<:ExpansionVertices,H<:Unsigned} <: AbstractCluster
         expansion_vertices::V
         ghash::H
 end

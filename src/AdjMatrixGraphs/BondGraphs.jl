@@ -3,16 +3,15 @@ struct BondGraph{W<:AbstractVector,M<:AbstractMatrix{<:Integer}} <: AbstractAdjM
         adj_matrix::M
 end
 
-
-# TODO: Figure out how to incorporate neighbor_fn
 function BondGraph(real_space_lattice::RealSpaceLattice, tiling::Tiling)
-        
         dist_matrix = pairwise_distance(real_space_lattice)
-        adj_matrix = zeros(Int, size(dist_matrix))
+        adj_matrix = @MMatrix zeros(Int, size(dist_matrix))
 
         @inbounds adj_matrix[diagind(adj_matrix)] = labels(real_space_lattice)
         for (i, neighbor) in enumerate(real_space_neighbors(tiling))
-                @inbounds adj_matrix[findall(isapprox(neighbor), dist_matrix)] .= i
+                eq_dist = findall(isapprox(neighbor), dist_matrix)
+
+                @inbounds adj_matrix[eq_dist] = tiling.neighbor_fn(real_space_lattice, eq_dist, i)
         end
 
         BondGraph(neighbors, adj_matrix)
@@ -26,13 +25,9 @@ function weighted_iso_hash(g::BondGraph)
 
         weighted_adj_mat = adj_matrix(g)
         # This is to get edge-labels to work
-        nauty_labels = vcat(
-                labels(g),
-                zeros(Int64, fld(count(>(1), weighted_adj_mat), 2)),
-        )
+        nauty_labels = vcat(labels(g), zeros(Int64, fld(count(>(1), weighted_adj_mat), 2)))
 
-        unweighted_adjacency_matrix =
-                zeros(Int64, length(nauty_labels), length(nauty_labels))
+        unweighted_adjacency_matrix = @MMatrix zeros(Int64, length(nauty_labels), length(nauty_labels))
 
         current_aux_vert = nv(cluster) + 1
         for j = 1:size(weighted_adj_mat, 2)
@@ -78,8 +73,7 @@ returns the permutation to rearrange the cluster used by Nauty
 """
 function unweighted_iso_hash(g::BondGraph)
 
-        nauty_graph =
-                NautyGraph(adj_matrix(g), labels(g))
+        nauty_graph = NautyGraph(adj_matrix(g), labels(g))
         # Canonize and find the corresponding permutation
         permutation = canonize!(nauty_graph)
 
@@ -91,21 +85,28 @@ function unweighted_iso_hash(g::BondGraph)
         # add extra vertices
         # Permutation goes from the original graph to the
         # canonized graph
-        return (ghash(nauty_graph), @inbounds(permutation[1:nv(g)])
+        return (ghash(nauty_graph), @inbounds(permutation[1:nv(g)]))
 
 end
 
 
-function isomorphic_hash(sg::BondGraph, real_space_vertices::AbstractVector, mask::BitMatrix)
+function isomorphic_hash(
+        exp_v::ExpansionVertices,
+        bg::BondGraph,
+        lattice::ExpansionLattice,
+        eg::ExpansionLatticeGraph,
+)
 
+        rsv = real_space_vertices(lattice, exp_v)
         # create new graph that is subgraph of sg
-        new_adj_matrix = sg.adj_matrix[real_space_vertices, real_space_vertices]
-        new_adj_matrix[mask] .= 0
-        # in this case, the number of weights doesn't matter
+        new_adj_matrix = bg.adj_matrix[rsv, rsv]
+        new_adj_matrix[get_mask(eg, exp_v, rsv)] .= 0
+        # No need to run expensive unique function here
         g = BondGraph(Bool[], new_adj_matrix)
-        if nw(g) > 1
+
+        if nw(bg) > 1
                 return weighted_iso_hash(g)
         end
-        
+
         unweighted_iso_hash(g)
 end

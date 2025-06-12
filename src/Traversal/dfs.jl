@@ -8,7 +8,14 @@ thread_empty!(c::Consensus) = (c.is_done[c.thread_id] = 0)
 thread_working!(c::Consensus) = (c.is_done[c.thread_id] = 1)
 
 
-function dfs_kernel!(dfs_lock::ReentrantLock, next::Stack{AbstractCluster}, lattice::ExpansionLattice, parents::AbstractSet{Subgraph}, max_order::Integer, c::Consensus)
+function dfs_kernel!(
+        dfs_lock::ReentrantLock,
+        next::Stack{AbstractCluster},
+        lattice::ExpansionLattice,
+        parents::AbstractSet{Subgraph},
+        max_order::Integer,
+        c::Consensus,
+)
 
         while true
 
@@ -46,7 +53,13 @@ function dfs_kernel!(dfs_lock::ReentrantLock, next::Stack{AbstractCluster}, latt
         println("Finished")
 end
 
-function dfs!(next::Stack{Subgraph}, cluster::Cluster, source::Subgraph, parents::AbstractSet{Subgraph}, max_order::Integer)
+function dfs!(
+        next::Stack{Subgraph},
+        cluster::Cluster,
+        source::Subgraph,
+        parents::AbstractSet{Subgraph},
+        max_order::Integer,
+)
 
         push!(next, source)
         push!(parents, source)
@@ -55,7 +68,7 @@ function dfs!(next::Stack{Subgraph}, cluster::Cluster, source::Subgraph, parents
 
         con_array = ones(Int, Threads.nthreads())
 
-        Threads.@threads for i in 1:Threads.nthreads()
+        Threads.@threads for i = 1:Threads.nthreads()
                 c = Consensus(view(con_array, :), Threads.threadid())
                 dfs_kernel!(dfs_lock, next, cluster, parents, max_order, c)
         end
@@ -63,7 +76,12 @@ function dfs!(next::Stack{Subgraph}, cluster::Cluster, source::Subgraph, parents
         parents
 end
 
-function grow_lower_site!(cluster::Cluster, parents::AbstractSet{Subgraph}, start::Integer, max_order::Integer)
+function grow_lower_site!(
+        cluster::Cluster,
+        parents::AbstractSet{Subgraph},
+        start::Integer,
+        max_order::Integer,
+)
 
         root_subgraph = Subgraph(start, cluster)
 

@@ -31,11 +31,11 @@ include("Traversal/vsimple.jl")
 #
 
 export SiteExpansionBundle,
-        StrongClusterExpansionBundle,
-        WeakClusterExpansionBundle,
-        site_expansion_NLCE,
-        simple_NLCE,
-        write_to_file,
-        write_to_file_fortran
+    StrongClusterExpansionBundle,
+    WeakClusterExpansionBundle,
+    site_expansion_NLCE,
+    simple_NLCE,
+    write_to_file,
+    write_to_file_fortran
 
 end

@@ -1,6 +1,5 @@
 
-struct DistanceCluster{V<:AbstractSet{<:Unsigned},H<:Unsigned} <: AbstractCluster
-        expansion_vertices::V
-        ghash::H
+struct DistanceCluster{V<:ExpansionVertices,H<:Unsigned} <: AbstractCluster
+    expansion_vertices::V
+    ghash::H
 end
-

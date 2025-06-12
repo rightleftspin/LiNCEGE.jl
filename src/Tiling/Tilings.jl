@@ -1,21 +1,31 @@
-struct Tiling{B<:AbstractVector{<:AbstractVector{<:AbstractVector{<:Float}}},T<:AbstractVector{AbstractVector{<:Float}},L<:AbstractVector{AbstractVector{<:Integer}},N<:AbstractVector{<:Float},F}
+struct Tiling{
+        B<:AbstractVector{<:AbstractVector{<:AbstractVector{<:Real}}},
+        T<:AbstractVector{AbstractVector{<:Real}},
+        L<:AbstractVector{AbstractVector{<:Integer}},
+        N<:AbstractVector{<:Real},
+        F,
+}
         tiling_unit::B
         translation_vectors::T
         translation_labels::L
         expansion_neighbors::N
         real_space_neighbors::N
-
-        # Optional
         labels::L
         neighbor_fn::F
 end
 
 function Tiling(
-        basis::AbstractVector{<:AbstractVector{<:Float}},
-        primitive_vectors::AbstractVector{AbstractVector{<:Float}},
-        neighbors::AbstractVector{<:Float};
+        basis::AbstractVector{<:AbstractVector{<:Real}},
+        primitive_vectors::AbstractVector{AbstractVector{<:Real}},
+        neighbors::AbstractVector{<:Real};
         labels::AbstractVector{<:Integer}=repeat([1], length(basis)),
-        neighbor_fn::Function=((c1, c2, d, dir) -> nothing),
+        neighbor_fn::Function=(
+                (
+                        lattice::RealSpaceLattice,
+                        adj_coordinates::Vector{CartesianIndex{2}},
+                        distance_index::Int,
+                ) -> repeat([distance_index], length(adj_coordinates))
+        ),
         expand_by_basis::Bool=false,
 )
 
@@ -39,17 +49,9 @@ function Tiling(
                 neighbors,
                 neighbors,
                 opt_labels,
-                neighbor_fn
+                neighbor_fn,
         )
 end
 
-
-
+dimension(tiling::Tiling) = length(tiling.translation_vectors[1])
 real_space_neighbors(tiling::Tiling) = tiling.real_space_neighbors
-
-
-
-
-
-
-

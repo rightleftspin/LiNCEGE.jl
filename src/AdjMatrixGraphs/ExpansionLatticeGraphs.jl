@@ -16,8 +16,17 @@ function ExpansionLatticeGraph(real_space_lattice::RealSpaceLattice, tiling::Til
         ExpansionLatticeGraph(adj_matrix)
 end
 
-function get_mask(g::ExpansionLatticeGraph, expansion_vertices::AbstractVector, real_space_vertices::AbstractVector)
-        mask = any.(!in(expansion_vertices), adj_matrix(g)[real_space_vertices, real_space_vertices])
+function get_mask(
+        exp_v::ExpansionVertices,
+        eg::ExpansionLatticeGraph,
+        lattice::ExpansionLattice
+)
+        rsv = real_space_vertices(lattice, exp_v)
+
+        mask = any.(
+                !in(exp_v),
+                adj_matrix(eg)[rsv, rsv],
+        )
         # Set diagonal to 0 so that it doesn't cancel out later
         mask[diagind(mask)] .= 0
         mask
