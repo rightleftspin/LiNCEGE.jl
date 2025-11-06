@@ -26,9 +26,9 @@ import LINCEGE:
     ClusterCollections.get_orders,
     _NI
 
-abstract type AbstractExpansion{C<:AbstractCluster} end
-abstract type AbstractSiteExpansion{C<:AbstractCluster} <: AbstractExpansion{C} end
-abstract type AbstractClusterExpansion{C<:AbstractCluster} <: AbstractExpansion{C} end
+abstract type AbstractExpansion{H<:AbstractGraphHash,C<:AbstractCluster} end
+abstract type AbstractSiteExpansion{H<:AbstractGraphHash,C<:AbstractCluster} <: AbstractExpansion{H,C} end
+abstract type AbstractClusterExpansion{H<:AbstractGraphHash,C<:AbstractCluster} <: AbstractExpansion{H,C} end
 
 Base.iterate(ce::AbstractExpansion) = _NI("iterate")
 Base.iterate(ce::AbstractExpansion, state) = _NI("iterate")
@@ -76,8 +76,6 @@ export AbstractExpansion,
     AbstractSiteExpansion,
     AbstractClusterExpansion,
     SiteExpansion,
-    add_lattice_constant!,
-    subtract_subgraph_contribution!,
     summation!
 
 end

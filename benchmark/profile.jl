@@ -11,7 +11,7 @@ basis = [[0.0, 0.0]]
 primitive_vectors = [[1, 0], [0, 1]]
 colors = [1]
 neighbor_distances = [1.0]
-max_order_square = 9
+max_order_square = 8
 
 square_lattice = SiteExpansionLattice(
     max_order_square,

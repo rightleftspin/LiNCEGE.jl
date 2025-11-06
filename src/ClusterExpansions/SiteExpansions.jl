@@ -1,7 +1,7 @@
-struct SiteExpansion{C<:AbstractCluster} <: AbstractSiteExpansion{C}
-    clusters::Dict{AbstractGraphHash,C}
-    multiplicities::Dict{AbstractGraphHash,AbstractVector{<:Real}}
-    subgraphs::Dict{AbstractGraphHash,Subgraphs}
+struct SiteExpansion{H<:AbstractGraphHash,C<:AbstractCluster} <: AbstractSiteExpansion{H,C}
+    clusters::Dict{H,C}
+    multiplicities::Dict{H,AbstractVector{Float64}}
+    subgraphs::Dict{H,Subgraphs}
 end
 
 function SiteExpansion(clusters::IsomorphicClusters, lattice::AbstractSiteExpansionLattice)
@@ -18,7 +18,7 @@ function SiteExpansion(clusters::IsomorphicClusters, lattice::AbstractSiteExpans
     end
     @info "Finished subgraph enumeration"
 
-    SiteExpansion{IsomorphicCluster}(clustersDict, multiplicitiesDict, subgraphsDict)
+    SiteExpansion{IsomorphicHash,IsomorphicCluster}(clustersDict, multiplicitiesDict, subgraphsDict)
 end
 
 Base.getindex(ce::SiteExpansion, cluster::AbstractCluster, order::Int) = @inbounds ce.multiplicities[ghash(cluster)][order]
