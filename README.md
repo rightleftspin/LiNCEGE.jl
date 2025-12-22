@@ -21,3 +21,20 @@ If LINCEGE.jl helped you in your research, please cite us using the following ci
 ```
 
 Funded by the U.S. Department of Energy: Grant Number DE-SC0022311
+
+
+This section only needs to be run the first time you clone the repository
+
+julia --project=.
+
+using Pkg
+
+Pkg.instantiate()
+
+exit()
+
+From here on out, you can just run
+
+julia --project=. examples/ex-1.jl
+
+or any other file in the repository.
