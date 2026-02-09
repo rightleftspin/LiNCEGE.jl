@@ -1,20 +1,29 @@
-name = "NLCE"
-uuid = "05a42466-2424-421a-a839-b20fe9622506"
-authors = ["Pranav <pranav@myrdd.info>"]
-version = "0.1.0"
+name = "LINCEGE"
+uuid = "f7bb31c1-1dce-4f9f-a981-827e9ac9009b"
+authors = ["Pranav Seetharaman <pranav@myrdd.info> and contributors"]
+version = "1.0.0-DEV"
 
 [deps]
-BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
 Distances = "b4f34e82-e78d-54a5-968a-f98e89d6e8f7"
 Graphs = "86223c79-3864-5bf0-83f7-82e725a168b6"
-JLD = "4138dd39-2aa7-5051-a626-17a0bb65d9c8"
 JSON3 = "0f8b85d8-7281-11e9-16c2-39a750bddbf1"
-JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 NautyGraphs = "7509a0a4-015a-4167-b44b-0799a1a2605e"
-PkgBenchmark = "32113eaa-f34f-5b0d-bd6c-c81e245fc73d"
-Profile = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
-Rotations = "6038ab10-8711-5258-84ad-4b1120ba62dc"
-Serde = "db9b398d-9517-45f8-9a95-92af99003e0e"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+
+[compat]
+DataStructures = "0.19.1"
+Distances = "0.10.12"
+Graphs = "1.13.1"
+JSON3 = "1.14.3"
+LinearAlgebra = "1.11.0"
+NautyGraphs = "0.6.3"
+StaticArrays = "1.9.15"
+julia = "1.6.7"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
