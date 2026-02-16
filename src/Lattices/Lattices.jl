@@ -18,6 +18,8 @@ abstract type AbstractLattice end
 centers(lattice::AbstractLattice) = _NI("centers")
 max_order(lattice::AbstractLattice) = _NI("max_order")
 neighbors(lattice::AbstractLattice, vs::AbstractVertices) = _NI("neighbors")
+get_coordinates(lattice::AbstractLattice) = _NI("get_coordinates")
+get_labels(lattice::AbstractLattice) = _NI("get_labels")
 
 include("InfiniteLattices/InfiniteLattices.jl")
 

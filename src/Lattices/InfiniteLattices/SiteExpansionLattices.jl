@@ -20,3 +20,7 @@ max_order(lattice::SiteExpansionLattice) = lattice.max_order
 n_unique_sites(lattice::SiteExpansionLattice) = basis_size(lattice.unit_cell)
 
 neighbors(lattice::SiteExpansionLattice, vs::ExpansionVertices) = union(ExpansionVertices(), lattice.neighbor_list[vs])
+
+get_coordinates(lattice::SiteExpansionLattice) = shift_unit_cell(lattice.unit_cell, lattice.coordinates)
+get_labels(lattice::SiteExpansionLattice) = lattice.coordinates[end, :]
+bond_matrix(lattice::SiteExpansionLattice) = generate_weighted_adj_matrix(lattice.coordinates, lattice.unit_cell)

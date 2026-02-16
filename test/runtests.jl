@@ -126,4 +126,22 @@ using Test
             end
         end
     end
+    @testset verbose = true "Clusters" begin
+        import LINCEGE:
+            Clusters.ClusterSet,
+            Clusters.clusters_from_lattice!
+
+        @testset "Translation Clusters Square" begin
+            basis = [[0.0, 0.0]]
+            primitive_vectors = [[1.0, 0.0], [0.0, 1.0]]
+            bonds = [Bond(1, 1, [1, 0], 1), Bond(1, 1, [0, 1], 1)]
+            unit_cell = UnitCell(basis, primitive_vectors, bonds)
+
+            m_order = 7
+            lattice = SiteExpansionLattice(m_order, unit_cell)
+            translation_clusters = ClusterSet(lattice)
+            clusters_from_lattice!(translation_clusters, lattice)
+            println("Num Clusters: $(length(translation_clusters))")
+        end
+    end
 end

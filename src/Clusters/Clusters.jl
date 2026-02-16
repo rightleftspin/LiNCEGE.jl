@@ -1,6 +1,7 @@
 module Clusters
 
 using Base.Threads
+using LinearAlgebra
 
 import LINCEGE:
     _NI,
@@ -8,6 +9,9 @@ import LINCEGE:
     Lattices.centers,
     Lattices.max_order,
     Lattices.neighbors,
+    Lattices.get_coordinates,
+    Lattices.get_labels,
+    Lattices.bond_matrix,
     Lattices.AbstractLattice,
     Lattices.SiteExpansionLattice
 
@@ -22,20 +26,33 @@ Base.hash(c::AbstractCluster, h::UInt) = _NI("Base.hash")
 Base.isequal(c1::C, c2::C) where {C<:AbstractCluster} = c1 == c2
 Base.:(==)(c1::C, c2::C) where {C<:AbstractCluster} = (hash(c1) == hash(c2))
 
+# Hasher Methods
+ghash(h::AbstractHasher, evs::ExpansionVertices) = _NI("ghash")
+
 # Cluster Set Methods
 Base.length(cs::AbstractClusterSet)::Int = _NI("Base.length")
 Base.in(cluster::C, cs::AbstractClusterSet{C,H}) where {C<:AbstractCluster,H} = _NI("Base.in")
 Base.iterate(cs::AbstractClusterSet) = _NI("Base.iterate")
 Base.iterate(cs::AbstractClusterSet, state) = _NI("Base.iterate")
 Base.push!(cs::AbstractClusterSet{C,H}, c::C) where {C<:AbstractCluster,H} = _NI("Base.push!")
-add_cluster!(cs::AbstractClusterSet, cluster::AbstractCluster) = _NI("add_cluster!")
+Base.pop!(cs::AbstractClusterSet{C,H}, c::C) where {C<:AbstractCluster,H} = _NI("Base.pop!")
+ghash(cs::AbstractClusterSet, c::AbstractCluster) = _NI("ghash")
+ghash(cs::AbstractClusterSet, evs::ExpansionVertices) = _NI("ghash")
 
-include("Hashers.jl")
-include("Cluster.jl")
+# The following function is slow
+function add_cluster!(cs::AbstractClusterSet{C,H}, c::AbstractCluster) where {C,H}
+    new_cluster = C(c.evs, c.lc, ghash(cs, c))
+    if new_cluster in cs
+        old_cluster = pop!(cs, new_cluster)
+        push!(cs, C(c.evs, c.lc + old_cluster.lc, old_cluster.ghash))
+    else
+        push!(cs, new_cluster)
+    end
+end
 
 function clusters_from_lattice!(clusters::AbstractClusterSet{C,H}, lattice::SiteExpansionLattice; spawn_depth::Int=3) where {C<:AbstractCluster,H}
     max_depth = max_order(lattice)
-    roots = [C(center, clusters) for center in centers(lattice)]
+    roots = [C(ExpansionVertices(center), clusters) for center in centers(lattice)]
     vlock = ReentrantLock()
 
     function try_mark(cluster::AbstractCluster)
@@ -59,13 +76,13 @@ function clusters_from_lattice!(clusters::AbstractClusterSet{C,H}, lattice::Site
 
         if depth < spawn_depth
             for ev in neighbors(lattice, cluster.evs)
-                dfs(C(union(cluster.evs, ev), clusters), depth + 1)
+                dfs(C(union(cluster.evs, ExpansionVertices(ev)), clusters), depth + 1)
             end
         else
             tasks = Task[]
             first = true
             for ev in neighbors(lattice, cluster.evs)
-                neighbor_cluster = C(union(cluster.evs, ev), clusters)
+                neighbor_cluster = C(union(cluster.evs, ExpansionVertices(ev)), clusters)
                 if first
                     dfs(neighbor_cluster, depth + 1)
                     first = false
@@ -92,5 +109,11 @@ function clusters_from_clusters!(new_clusters::AbstractClusterSet{C,H}, old_clus
     end
     new_clusters
 end
+
+include("Hashers.jl")
+include("Cluster.jl")
+include("ClusterSets.jl")
+include("util.jl")
+
 
 end

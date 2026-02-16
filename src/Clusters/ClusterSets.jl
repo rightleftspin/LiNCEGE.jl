@@ -1,4 +1,4 @@
-struct ClusterSet{C,H}
+struct ClusterSet{C<:AbstractCluster,H<:AbstractHasher} <: AbstractClusterSet{C,H}
     clusters::Set{C}
     hasher::H
 end
@@ -8,4 +8,19 @@ function ClusterSet(lattice::AbstractLattice)
         Set{Cluster}(),
         TranslationHasher(lattice)
     )
+end
+
+Base.length(cs::ClusterSet) = length(cs.clusters)
+Base.in(c::C, cs::ClusterSet{C,H}) where {C<:AbstractCluster,H} = c in cs.clusters
+Base.iterate(cs::ClusterSet) = iterate(cs.clusters)
+Base.iterate(cs::ClusterSet, state) = iterate(cs.clusters, state)
+Base.push!(cs::ClusterSet{C,H}, c::C) where {C<:AbstractCluster,H} = push!(cs.clusters, c)
+Base.pop!(cs::ClusterSet{C,H}, c::C) where {C<:AbstractCluster,H} = pop!(cs.clusters, c)
+
+function ghash(cs::ClusterSet{C,H}, c::C) where {C<:AbstractCluster,H}
+    ghash(cs.hasher, c.evs)
+end
+
+function ghash(cs::ClusterSet, evs::ExpansionVertices)
+    ghash(cs.hasher, evs)
 end
