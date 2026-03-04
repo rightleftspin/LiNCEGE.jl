@@ -1,5 +1,6 @@
 module UnitCells
-
+using Plots
+using ColorSchemes
 import LINCEGE:
     _NI
 

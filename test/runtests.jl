@@ -66,14 +66,15 @@ using Test
             UnitCells.dimension,
             UnitCells.basis_size,
             UnitCells.shift_unit_cell,
-            UnitCells.find_possible_neighbors
+            UnitCells.find_possible_neighbors,
+            UnitCells.image_unit_cell
 
         @testset "Square Lattice" begin
             basis = [[0.0, 0.0]]
             primitive_vectors = [[1.0, 0.0], [0.0, 1.0]]
             bonds = [Bond(1, 1, [1, 0], 1), Bond(1, 1, [0, 1], 1)]
-
-            unit_cell = UnitCell(basis, primitive_vectors, bonds)
+            colors=[1]
+            unit_cell = UnitCell(basis, primitive_vectors, bonds,colors)
 
             @test basis_size(unit_cell) == length(basis)
             @test dimension(unit_cell) == length(primitive_vectors)
@@ -81,6 +82,48 @@ using Test
             @test shift_unit_cell(unit_cell, [2, -2, 1]) == [2.0, -2.0]
             @test shift_unit_cell(unit_cell, [1 2 3; 0 -2 1; 1 1 1]) == [1.0 2.0 3.0; 0.0 -2.0 1.0]
             @test find_possible_neighbors(unit_cell, [0, 0, 1]) == [[1, 0, 1], [0, 1, 1]]
+            @test image_unit_cell(unit_cell) isa Plots.Plot{Plots.GRBackend}
+        end
+
+        @testset "Kagome Lattice" begin
+            basis = [[0.0,0.0],[1.0,0.0],[1/2,sqrt(3)/2]]
+            colors=[1,1,1]
+
+            primitive_vectors = [[2,0], [1,sqrt(3)]]
+            bonds = [Bond(1,2,[0,0],1), Bond(1,3,[0,0],1),Bond(2,3,[0,0],1),Bond(1,2,[-1,0],1),Bond(1,3,[0,-1],1),Bond(2,3,[1,-1],1)]
+            unit_cell = UnitCell(basis, primitive_vectors, bonds,colors)
+
+            @test image_unit_cell(unit_cell) isa Plots.Plot{Plots.GRBackend}
+            #The function displayes but also returns the plot. In order to save need to use a separate line
+            #savefig(image_unit_cell(unit_cell),"kagomeUnitCell.png")
+        end
+
+        @testset "One Fifth Depleted" begin
+            primitive_vectors = [[2.0,1.0], [-1.0,2.0]]
+            basis = [[0.0,0.0],[0.0,1.0],[0.0,2.0],[1.0,1.0]]
+            bonds = [Bond(1,2,[0,0],1),Bond(1,3,[0,-1],1),Bond(2,4,[0,0],1),Bond(3,4,[0,1],1),Bond(2,3,[0,0],2),Bond(1,4,[-1,0],2)]
+            colors=[1,1,1,1]
+            unit_cell = UnitCell(basis, primitive_vectors, bonds,colors)
+            @test image_unit_cell(unit_cell) isa Plots.Plot{Plots.GRBackend}
+
+        end
+        @testset "Shastry Sutherland" begin
+            primitive_vectors= [[(sqrt(3)+1)/sqrt(2),0],[0,(sqrt(3)+1)/sqrt(2)]]
+            basis = [[0.0,0.0],[(sqrt(3)+1)/(2*sqrt(2)),(sqrt(3)-1)/(2*sqrt(2))],[sqrt(2)/2,sqrt(6)/2],[(sqrt(3)+3)/(2*sqrt(2)),(sqrt(3)+1)/(2*sqrt(2))]]
+            bonds = [Bond(1,2,[0,0],1),Bond(2,3,[0,0],1),Bond(1,4,[-1,0],1), Bond(3,4,[-1,0],1),
+            Bond(3,4,[0,0],2),Bond(2,3,[0,-1],2),Bond(1,2,[-1,0],2),Bond(1,4,[-1,-1],2),
+            Bond(2,4,[-1,-1],3),Bond(1,3,[-1,0],3)]
+            colors=[1,2,3,4]
+            unit_cell = UnitCell(basis, primitive_vectors, bonds,colors)
+            @test image_unit_cell(unit_cell) isa Plots.Plot{Plots.GRBackend}
+        end
+        @testset "3D Cube" begin
+            primitive_vectors=[[1.0,0.0,0.0],[0.0,1.0,0.0],[0.0,0.0,1.0]]
+            basis=[[0.0,0.0,0.0]]
+            colors=[1]
+            bonds=[Bond(1,1,[1,0,0],1),Bond(1,1,[0,1,0],1),Bond(1,1,[0,0,1],1)]
+            unit_cell = UnitCell(basis, primitive_vectors, bonds,colors)
+           @test image_unit_cell(unit_cell) isa Plots.Plot{Plots.GRBackend}
         end
     end
 
@@ -99,7 +142,8 @@ using Test
                     basis = [[0.0, 0.0]]
                     primitive_vectors = [[1.0, 0.0], [0.0, 1.0]]
                     bonds = [Bond(1, 1, [1, 0], 1), Bond(1, 1, [0, 1], 1)]
-                    unit_cell = UnitCell(basis, primitive_vectors, bonds)
+                    colors=[1]
+                    unit_cell = UnitCell(basis, primitive_vectors, bonds,colors)
 
                     m_order = 2
                     lattice = SiteExpansionLattice(m_order, unit_cell)
@@ -111,9 +155,10 @@ using Test
                 end
                 @testset "Kagome Lattice" begin
                     basis = [[0, 0], [1, 0], [1 / 2, sqrt(3) / 2]]
+                    colors=[1,1,1]
                     primitive_vectors = [[2, 0], [1, sqrt(3)]]
                     bonds = [Bond(1, 2, [0, 0], 1), Bond(2, 3, [0, 0], 1), Bond(3, 1, [0, 0], 1), Bond(1, 2, [-1, 0], 1), Bond(1, 3, [0, -1], 1), Bond(2, 3, [0, 1], 1)]
-                    unit_cell = UnitCell(basis, primitive_vectors, bonds)
+                    unit_cell = UnitCell(basis, primitive_vectors, bonds,colors)
 
                     m_order = 2
                     lattice = SiteExpansionLattice(m_order, unit_cell)
@@ -140,7 +185,8 @@ using Test
             basis = [[0.0, 0.0]]
             primitive_vectors = [[1.0, 0.0], [0.0, 1.0]]
             bonds = [Bond(1, 1, [1, 0], 1), Bond(1, 1, [0, 1], 1)]
-            unit_cell = UnitCell(basis, primitive_vectors, bonds)
+            colors=[1]
+            unit_cell = UnitCell(basis, primitive_vectors, bonds,colors)
 
             m_order = 3
             lattice = SiteExpansionLattice(m_order, unit_cell)
