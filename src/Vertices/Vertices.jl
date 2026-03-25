@@ -40,8 +40,7 @@ Base.iterate(vs::AbstractVertices, state) = iterate(vertices(vs), state)
 
 Base.show(io::IO, vs::AbstractVertices) = print(io, "Vertices: ", collect(vs))
 
-include("ExpansionVertices.jl")
-include("LatticeVertices.jl")
+include("TaggedVertices.jl")
 
 export AbstractVertices,
     ExpansionVertices,

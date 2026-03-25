@@ -17,6 +17,7 @@ include("NI.jl")
 include("Vertices/Vertices.jl")
 include("UnitCells/UnitCells.jl")
 include("Lattices/Lattices.jl")
+include("Hashers/Hashers.jl")
 include("Clusters/Clusters.jl")
 include("Expansions/Expansions.jl")
 

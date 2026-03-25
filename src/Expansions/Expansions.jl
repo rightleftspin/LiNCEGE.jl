@@ -1,63 +1,64 @@
 module Expansions
 
-using DataStructures
-using StaticArrays
+using JSON
 
 import LINCEGE:
-    Vertices.ExpansionVertices,
-    Lattices.AbstractLattice,
-    Lattices.SiteExpansionLattice,
-    Lattices.neighbors,
-    Clusters.AbstractCluster,
-    Clusters.AbstractClusterSet,
-    Clusters.ghash
+        Vertices.ExpansionVertices,
+        Lattices.AbstractLattice,
+        Lattices.SiteExpansionLattice,
+        Lattices.neighbors,
+        Clusters.AbstractCluster,
+        Clusters.AbstractClusterSet,
+        Clusters.ghash
 
 abstract type AbstractExpansion end
 
 Base.getindex(e::AbstractExpansion, cluster_id::Int, order::Int) = _NI("Base.getindex")
-Base.getindex(e::AbstractExpansion, cluster_ids::Vector{Int}, order::Int) = _NI("Base.getindex")
-Base.setindex!(e::AbstractExpansion, l::Rational, cluster_id::Int, order::Int) = _NI("Base.setindex!")
-Base.setindex!(e::AbstractExpansion, l::Rational, cluster_ids::Vector{Int}, order::Int) = _NI("Base.setindex!")
-Base.setindex!(e::AbstractExpansion, ls, cluster_ids::Vector{Int}, order::Int) = _NI("Base.setindex!")
+Base.length(e::AbstractExpansion) = _NI("Base.length")
+add_array!(e::AbstractExpansion, order::Int, per_cluster::AbstractVector{Float64}) = _NI("add_array!")
 order_ids(e::AbstractExpansion, order::Int) = _NI("num_clusters")
 get_subclusters(e::AbstractExpansion, cluster_id::Int) = _NI("get_subclusters")
 
-function faster_summation!(e::AbstractExpansion, max_order::Int)
-    subgraphs = Deque{Tuple{Int,Int}}()
-    for order in 1:max_order
-        for cluster_id in order_ids(e, order)
-            updated_lattice_constant = e[cluster_id, order]
-            pushfirst!(subgraphs, (cluster_id, 0))
-            while !(length(subgraphs) == 0)
-                current_cluster_id, current_depth = popfirst!(subgraphs)
-                for subcluster_id in get_subclusters(e, current_cluster_id)
-                    e[subcluster_id, order] += iseven(current_depth) ? -updated_lattice_constant : updated_lattice_constant
-                    pushfirst!(subgraphs, (subcluster_id, current_depth + 1))
+function summation!(e::AbstractExpansion, max_order::Int)
+        stack = Vector{Tuple{Int,Float64}}()
+        per_cluster = zeros(Float64, length(e))
+        for order in 1:max_order
+                for cluster_id in order_ids(e, order)
+                        updated_lattice_constant = e[cluster_id, order]
+                        push!(stack, (cluster_id, -updated_lattice_constant))
+                        while !isempty(stack)
+                                current_cluster_id, contribution = pop!(stack)
+                                for subcluster_id in get_subclusters(e, current_cluster_id)
+                                        @inbounds per_cluster[subcluster_id] += contribution
+                                        push!(stack, (subcluster_id, -contribution))
+                                end
+                        end
                 end
-            end
+                add_array!(e, order, per_cluster)
+                fill!(per_cluster, zero(Float64))
         end
-    end
-    e
+        e
 end
 
-function slow_summation!(e::AbstractExpansion, max_order::Int)
-    subgraphs = Deque{Tuple{Int,Int}}()
-    for order in 1:max_order
-        for cluster_id in order_ids(e, order)
-            updated_lattice_constant = e[cluster_id, order]
-            pushfirst!(subgraphs, (cluster_id, 0))
-            while !(length(subgraphs) == 0)
-                current_cluster_id, current_depth = popfirst!(subgraphs)
-                for subcluster_id in get_subclusters(e, current_cluster_id)
-                    e[subcluster_id, order] += iseven(current_depth) ? -updated_lattice_constant : updated_lattice_constant
-                    pushfirst!(subgraphs, (subcluster_id, current_depth + 1))
-                end
-            end
+function write_to_file(e::AbstractExpansion, cs::AbstractClusterSet, lattice::AbstractLattice) 
+        clusters = []
+        for cluster in cs 
+                push!(clusters, 
+                        Dict(
+                                "Bond List" => [],
+                                "Coordinates" => [],
+                                "Site Colors" => [],
+                                "Multiplicities" => [],
+                        )
+                )
         end
-    end
-    e
+
+        
+        json_clusters = JSON.json(clusters; pretty_print=true)
+
 end
 
 include("util.jl")
 include("SiteExpansions.jl")
+
 end

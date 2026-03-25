@@ -4,14 +4,14 @@ using LinearAlgebra
 using StaticArrays
 
 import LINCEGE:
-    _NI,
-    Vertices.AbstractVertices,
-    Vertices.ExpansionVertices,
-    UnitCells.UnitCell,
-    UnitCells.dimension,
-    UnitCells.basis_size,
-    UnitCells.shift_unit_cell,
-    UnitCells.find_possible_neighbors
+        _NI,
+        Vertices.AbstractVertices,
+        Vertices.ExpansionVertices,
+        UnitCells.UnitCell,
+        UnitCells.dimension,
+        UnitCells.basis_size,
+        UnitCells.shift_unit_cell,
+        UnitCells.find_possible_neighbors
 
 abstract type AbstractLattice end
 

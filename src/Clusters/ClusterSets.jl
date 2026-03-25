@@ -1,20 +1,20 @@
 struct ClusterSet{C<:AbstractCluster,H<:AbstractHasher} <: AbstractClusterSet{C,H}
-    clusters::Set{C}
-    hasher::H
+        clusters::Set{C}
+        hasher::H
 end
 
 function ClusterSet(lattice::AbstractLattice)
-    ClusterSet{Cluster,TranslationHasher}(
-        Set{Cluster}(),
-        TranslationHasher(lattice)
-    )
+        ClusterSet{Cluster,TranslationHasher}(
+                Set{Cluster}(),
+                TranslationHasher(lattice)
+        )
 end
 
 function IsomorphicClusterSet(lattice::AbstractLattice)
-    ClusterSet{Cluster,IsomorphicHasher}(
-        Set{Cluster}(),
-        IsomorphicHasher(lattice)
-    )
+        ClusterSet{Cluster,IsomorphicHasher}(
+                Set{Cluster}(),
+                IsomorphicHasher(lattice)
+        )
 end
 
 Base.length(cs::ClusterSet) = length(cs.clusters)
@@ -26,9 +26,9 @@ Base.pop!(cs::ClusterSet{C,H}, c::C) where {C<:AbstractCluster,H} = pop!(cs.clus
 Base.sort(cs::ClusterSet) = sort(collect(cs.clusters), by=length)
 
 function ghash(cs::ClusterSet{C,H}, c::C) where {C<:AbstractCluster,H}
-    ghash(cs.hasher, c.evs)
+        ghash(cs.hasher, c.evs)
 end
 
 function ghash(cs::ClusterSet, evs::ExpansionVertices)
-    ghash(cs.hasher, evs)
+        ghash(cs.hasher, evs)
 end
