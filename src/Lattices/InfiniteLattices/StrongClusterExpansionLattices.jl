@@ -1,19 +1,26 @@
 struct StrongClusterExpansionLattice <: AbstractInfiniteLattice
         max_order::UInt8
         unit_cell::UnitCell
+        lattice_unit_cells::Vector{UnitCell}
         coordinates::Matrix{Int}
         adj_matrix::Matrix{Int}
         neighbor_list::Vector{ExpansionVertices{Int}}
-        connections::Connections
+        connections::StrongClusterConnections
 end
 
-function StrongClusterExpansionLattice(max_order::Int, unit_cell::UnitCell)
+function StrongClusterExpansionLattice(max_order::Int, expansion_unit_cell::UnitCell, lattice_unit_cells::Vector{UnitCell})
         @assert max_order > 0 "max_order must be a positive integer"
+        @assert length(lattice_unit_cells) == basis_size(expansion_unit_cell) "Need one lattice_unit_cell per expansion site type"
 
-        coordinates = generate_coordinates(max_order, basis_size(unit_cell), dimension(unit_cell))
-        adj_matrix, neighbor_list = generate_lattice_data(coordinates, unit_cell)
-
-        return StrongClusterExpansionLattice(UInt8(max_order), unit_cell, coordinates, adj_matrix, neighbor_list)
+        return StrongClusterExpansionLattice(
+                UInt8(max_order),
+                expansion_unit_cell,
+                lattice_unit_cells,
+                phys_coords,
+                phys_adj_matrix,
+                expansion_neighbor_list,
+                StrongClusterConnections(connection_list)
+        )
 end
 
 centers(lattice::StrongClusterExpansionLattice) = find_centers(lattice.coordinates)

@@ -1,6 +1,6 @@
 struct IsomorphicHasher <: AbstractHasher
         hashing_matrix::Matrix{Int}
-        connections::Union{Connections,Nothing}
+        connections::Union{<:AbstractConnections,Nothing}
         labels::Vector{Int}
         is_weighted::Bool
 end

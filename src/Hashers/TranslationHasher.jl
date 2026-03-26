@@ -1,6 +1,6 @@
 struct TranslationHasher <: AbstractHasher
         hashing_matrix::Matrix{Int}
-        connections::Union{Connections,Nothing}
+        connections::Union{<:AbstractConnections,Nothing}
 end
 
 function TranslationHasher(lattice::SiteExpansionLattice)

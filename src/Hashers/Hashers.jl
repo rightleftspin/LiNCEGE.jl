@@ -13,7 +13,7 @@ import LINCEGE:
         Lattices.bond_matrix,
         Lattices.SiteExpansionLattice,
         Lattices.StrongClusterExpansionLattice,
-        Lattices.Connections
+        Lattices.AbstractConnections
 
 abstract type AbstractHasher end
 
