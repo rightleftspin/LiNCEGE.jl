@@ -24,21 +24,23 @@ function generate_lattice_data(coordinates::Matrix{Int}, unit_cell::UnitCell)
 
         coord_index = Dict{Vector{Int},Int}()
         for (i, col) in enumerate(eachcol(coordinates))
-                coord_index[collect(col)] = i
+                coord_index[col] = i
         end
 
         adj_matrix = zeros(Int, n, n)
         neighbor_sets = [BitSet() for _ in 1:n]
 
         for (index, col) in enumerate(eachcol(coordinates))
-                coord_vec = collect(col)
-                for (neighbor_coord, bond) in zip(find_possible_neighbors(unit_cell, coord_vec), unit_cell.bonds)
-                        ni = get(coord_index, neighbor_coord, 0)
-                        if ni != 0
-                                adj_matrix[index, ni] = bond.bond_type
-                                adj_matrix[ni, index] = bond.bond_type
-                                push!(neighbor_sets[index], ni)
-                                push!(neighbor_sets[ni], index)
+                for bond in unit_cell.bonds
+                        if bond.site1 == col[end]
+                                neighbor_coord = neighbor_site(bond, col)
+                                ni = get(coord_index, neighbor_coord, 0)
+                                if ni != 0
+                                        adj_matrix[index, ni] = bond.bond_type
+                                        adj_matrix[ni, index] = bond.bond_type
+                                        push!(neighbor_sets[index], ni)
+                                        push!(neighbor_sets[ni], index)
+                                end
                         end
                 end
         end

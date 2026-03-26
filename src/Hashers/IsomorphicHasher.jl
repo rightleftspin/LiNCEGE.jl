@@ -1,5 +1,6 @@
 struct IsomorphicHasher <: AbstractHasher
         hashing_matrix::Matrix{Int}
+        connections::Union{Connections,Nothing}
         labels::Vector{Int}
         is_weighted::Bool
 end
@@ -8,15 +9,32 @@ function IsomorphicHasher(lattice::SiteExpansionLattice)
         hashing_matrix = bond_matrix(lattice)
         labels = get_site_colors(lattice)
         is_weighted = length(unique(hashing_matrix)) > 2
-        IsomorphicHasher(hashing_matrix, labels, is_weighted)
+        IsomorphicHasher(hashing_matrix, nothing, labels, is_weighted)
+end
+
+function IsomorphicHasher(lattice::StrongClusterExpansionLattice)
+        hashing_matrix = bond_matrix(lattice)
+        labels = get_site_colors(lattice)
+        is_weighted = length(unique(hashing_matrix)) > 2
+        IsomorphicHasher(hashing_matrix, connections(lattice), labels, is_weighted)
 end
 
 function ghash(hasher::IsomorphicHasher, evs::ExpansionVertices)
-        h, _ = if hasher.is_weighted
-                weighted_iso_hash(hasher.hashing_matrix[evs, evs], hasher.labels[evs])
+        if isnothing(hasher.connections)
+                h, _ = if hasher.is_weighted
+                        weighted_iso_hash(hasher.hashing_matrix[evs, evs], hasher.labels[evs])
+                else
+                        unweighted_iso_hash(hasher.hashing_matrix[evs, evs], hasher.labels[evs])
+                end
         else
-                unweighted_iso_hash(hasher.hashing_matrix[evs, evs], hasher.labels[evs])
+                lvs = union(LatticeVertices(), hasher.connections[evs])
+                h, _ = if hasher.is_weighted
+                        weighted_iso_hash(hasher.hashing_matrix[lvs, lvs], hasher.labels[evs])
+                else
+                        unweighted_iso_hash(hasher.hashing_matrix[lvs, lvs], hasher.labels[lvs])
+                end
         end
+
         h
 end
 

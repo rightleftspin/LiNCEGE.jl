@@ -1,17 +1,18 @@
 module Lattices
 
 using LinearAlgebra
-using StaticArrays
 
 import LINCEGE:
         _NI,
         Vertices.AbstractVertices,
         Vertices.ExpansionVertices,
+        Vertices.LatticeVertices,
         UnitCells.UnitCell,
         UnitCells.dimension,
         UnitCells.basis_size,
         UnitCells.shift_unit_cell,
-        UnitCells.find_possible_neighbors
+        UnitCells.find_possible_neighbors,
+        UnitCells.neighbor_site
 
 abstract type AbstractLattice end
 
@@ -21,7 +22,9 @@ neighbors(lattice::AbstractLattice, vs::AbstractVertices) = _NI("neighbors")
 get_coordinates(lattice::AbstractLattice) = _NI("get_coordinates")
 get_labels(lattice::AbstractLattice) = _NI("get_labels")
 get_site_colors(lattice::AbstractLattice) = _NI("get_site_colors")
+bond_matrix(lattice::AbstractLattice) = _NI("bond_matrix")
 
+include("Connections.jl")
 include("InfiniteLattices/InfiniteLattices.jl")
 
 end

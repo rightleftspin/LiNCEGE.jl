@@ -1,7 +1,7 @@
 module Vertices
 
 import LINCEGE:
-    _NI
+        _NI
 
 abstract type AbstractVertices{V} end
 
@@ -23,17 +23,15 @@ Base.contains(vs::AbstractVertices, v) = v in vs
 Base.haskey(vs::AbstractVertices, v) = v in vs
 
 function Base.union(vs::AbstractVertices, itr)
-    vstemp = vs
-    for x in itr
-        vstemp = union(vstemp, x)
-    end
-    vstemp
+        vstemp = vs
+        for x in itr
+                vstemp = union(vstemp, x)
+        end
+        vstemp
 end
 
 Base.getindex(vec::Vector, vs::AbstractVertices) = vec[collect(vs)]
 Base.getindex(mat::Matrix, vs1::AbstractVertices, vs2::AbstractVertices) = mat[collect(vs1), collect(vs2)]
-Base.getindex(mat::Matrix, vs1::AbstractVertices, i::Int) = mat[collect(vs1), i]
-Base.getindex(mat::Matrix, i::Int, vs1::AbstractVertices) = mat[i, collect(vs1)]
 
 Base.iterate(vs::AbstractVertices) = iterate(vertices(vs))
 Base.iterate(vs::AbstractVertices, state) = iterate(vertices(vs), state)
@@ -43,6 +41,6 @@ Base.show(io::IO, vs::AbstractVertices) = print(io, "Vertices: ", collect(vs))
 include("TaggedVertices.jl")
 
 export AbstractVertices,
-    ExpansionVertices,
-    LatticeVertices
+        ExpansionVertices,
+        LatticeVertices
 end

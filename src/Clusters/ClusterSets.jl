@@ -3,7 +3,7 @@ struct ClusterSet{C<:AbstractCluster,H<:AbstractHasher} <: AbstractClusterSet{C,
         hasher::H
 end
 
-function ClusterSet(lattice::AbstractLattice)
+function TranslationClusterSet(lattice::AbstractLattice)
         ClusterSet{Cluster,TranslationHasher}(
                 Set{Cluster}(),
                 TranslationHasher(lattice)
@@ -25,10 +25,5 @@ Base.push!(cs::ClusterSet{C,H}, c::C) where {C<:AbstractCluster,H} = push!(cs.cl
 Base.pop!(cs::ClusterSet{C,H}, c::C) where {C<:AbstractCluster,H} = pop!(cs.clusters, c)
 Base.sort(cs::ClusterSet) = sort(collect(cs.clusters), by=length)
 
-function ghash(cs::ClusterSet{C,H}, c::C) where {C<:AbstractCluster,H}
-        ghash(cs.hasher, c.evs)
-end
-
-function ghash(cs::ClusterSet, evs::ExpansionVertices)
-        ghash(cs.hasher, evs)
-end
+ghash(cs::ClusterSet{C,H}, c::C) where {C<:AbstractCluster,H} = ghash(cs.hasher, c.evs)
+ghash(cs::ClusterSet, evs::ExpansionVertices) = ghash(cs.hasher, evs)

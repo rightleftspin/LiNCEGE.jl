@@ -7,15 +7,13 @@ using NautyGraphs
 import LINCEGE:
         _NI,
         Vertices.ExpansionVertices,
-        Lattices.centers,
-        Lattices.max_order,
-        Lattices.neighbors,
         Lattices.get_coordinates,
         Lattices.get_labels,
         Lattices.get_site_colors,
         Lattices.bond_matrix,
-        Lattices.AbstractLattice,
-        Lattices.SiteExpansionLattice
+        Lattices.SiteExpansionLattice,
+        Lattices.StrongClusterExpansionLattice,
+        Lattices.Connections
 
 abstract type AbstractHasher end
 

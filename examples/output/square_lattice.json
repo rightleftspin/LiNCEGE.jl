@@ -1,0 +1,95 @@
+[
+    {
+        "cluster_id": 1,
+        "coordinates": [
+            [
+                0,
+                0
+            ]
+        ],
+        "lc": 1,
+        "bonds": [
+        ],
+        "site_colors": [
+            1
+        ],
+        "weights": [
+            1,
+            -4,
+            6
+        ],
+        "n_sites": 1
+    },
+    {
+        "cluster_id": 2,
+        "coordinates": [
+            [
+                0,
+                -1
+            ],
+            [
+                0,
+                0
+            ]
+        ],
+        "lc": 2,
+        "bonds": [
+            {
+                "bond_type": 1,
+                "site1": 1,
+                "site2": 2
+            }
+        ],
+        "site_colors": [
+            1,
+            1
+        ],
+        "weights": [
+            0,
+            2,
+            -12
+        ],
+        "n_sites": 2
+    },
+    {
+        "cluster_id": 3,
+        "coordinates": [
+            [
+                -1,
+                -1
+            ],
+            [
+                0,
+                -1
+            ],
+            [
+                0,
+                0
+            ]
+        ],
+        "lc": 6,
+        "bonds": [
+            {
+                "bond_type": 1,
+                "site1": 1,
+                "site2": 2
+            },
+            {
+                "bond_type": 1,
+                "site1": 2,
+                "site2": 3
+            }
+        ],
+        "site_colors": [
+            1,
+            1,
+            1
+        ],
+        "weights": [
+            0,
+            0,
+            6
+        ],
+        "n_sites": 3
+    }
+]

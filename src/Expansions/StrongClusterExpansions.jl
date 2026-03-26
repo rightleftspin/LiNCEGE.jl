@@ -1,17 +1,18 @@
-struct SiteExpansion <: AbstractExpansion
+struct StrongClusterExpansion <: AbstractExpansion
         index_dictionary::Dict{UInt,Int}
         subgraphs::Vector{Vector{Int}}
         weights::Matrix{Float64}
         order_ids::Dict{Int,Vector{Int}}
 end
 
-function SiteExpansion(clusters::AbstractClusterSet, lattice::SiteExpansionLattice, max_order::Int)
+function StrongClusterExpansion(clusters::AbstractClusterSet, lattice::StrongClusterExpansionLattice, max_order::Int)
         index_dictionary = Dict{UInt,Int}()
         subgraphs = Vector{Vector{Int}}()
-        weights = zeros(Float64, length(clusters), max_order)
+        weights = zeros(Float64, length(clusters), max_order + 1)
         order_ids = Dict{Int,Vector{Int}}()
 
-        for (i, cluster) in enumerate(sort(clusters))
+        single_site_clusters = get_single_site_clusters(lattice)
+        for (i, cluster) in enumerate(single_site_clusters)
                 if haskey(order_ids, length(cluster))
                         push!(order_ids[length(cluster)], i)
                 else
@@ -19,14 +20,25 @@ function SiteExpansion(clusters::AbstractClusterSet, lattice::SiteExpansionLatti
                 end
                 index_dictionary[cluster.ghash] = i
                 weights[i, length(cluster)] = cluster.lc
+                push!(subgraphs, Int[])
+        end
+
+        for (i, cluster) in enumerate(sort(clusters))
+                if haskey(order_ids, length(cluster) + 1)
+                        push!(order_ids[length(cluster)+1], i + length(single_site_clusters))
+                else
+                        order_ids[length(cluster)+1] = [i + length(single_site_clusters)]
+                end
+                index_dictionary[cluster.ghash] = i + length(single_site_clusters)
+                weights[i, length(cluster)+1] = cluster.lc
                 temp_subgraphs = Int[]
-                for subgraph_evs in get_subgraphs(cluster, lattice)
+                for subgraph_evs in union(get_subgraphs(cluster, lattice), get_single_site_subgraphs(cluster, lattice))
                         push!(temp_subgraphs, index_dictionary[ghash(clusters, subgraph_evs)])
                 end
                 push!(subgraphs, temp_subgraphs)
         end
 
-        SiteExpansion(
+        StrongClusterExpansion(
                 index_dictionary,
                 subgraphs,
                 weights,
@@ -34,16 +46,18 @@ function SiteExpansion(clusters::AbstractClusterSet, lattice::SiteExpansionLatti
         )
 end
 
-Base.getindex(e::SiteExpansion, cluster_id::Int, order::Int) = getindex(e.weights, cluster_id, order)
-Base.length(e::SiteExpansion) = length(e.subgraphs)
-order_ids(e::SiteExpansion, order::Int) = e.order_ids[order]
-get_subclusters(e::SiteExpansion, cluster_id::Int) = e.subgraphs[cluster_id]
-function add_array!(e::SiteExpansion, order::Int, per_cluster::AbstractVector{Float64})
+Base.getindex(e::StrongClusterExpansion, cluster_id::Int, order::Int) = getindex(e.weights, cluster_id, order)
+Base.length(e::StrongClusterExpansion) = length(e.subgraphs)
+order_ids(e::StrongClusterExpansion, order::Int) = e.order_ids[order]
+get_subclusters(e::StrongClusterExpansion, cluster_id::Int) = e.subgraphs[cluster_id]
+function add_array!(e::StrongClusterExpansion, order::Int, per_cluster::AbstractVector{Float64})
         @views e.weights[:, order] .+= per_cluster
 end
-summation!(e::SiteExpansion, max_order::Int) = _summation!(e, max_order)
 
-function write_to_json(e::SiteExpansion, lattice::SiteExpansionLattice, cs::AbstractClusterSet, filepath::String)
+summation!(e::StrongClusterExpansion, max_order::Int) = _summation!(e, max_order + 1)
+
+# TODO: Fix this function
+function write_to_json(e::StrongClusterExpansion, lattice::StrongClusterExpansionLattice, cs::AbstractClusterSet, filepath::String)
         all_coords = get_coordinates(lattice)
         all_colors = get_site_colors(lattice)
         adj = bond_matrix(lattice)

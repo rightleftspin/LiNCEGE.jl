@@ -1,14 +1,20 @@
 module Expansions
 
-using JSON
+using JSON3
 
 import LINCEGE:
+        _NI,
         Vertices.ExpansionVertices,
         Lattices.AbstractLattice,
         Lattices.SiteExpansionLattice,
+        Lattices.StrongClusterExpansionLattice,
         Lattices.neighbors,
+        Lattices.bond_matrix,
+        Lattices.get_coordinates,
+        Lattices.get_site_colors,
         Clusters.AbstractCluster,
         Clusters.AbstractClusterSet,
+        Clusters.get_single_site_subgraphs,
         Clusters.ghash
 
 abstract type AbstractExpansion end
@@ -16,10 +22,10 @@ abstract type AbstractExpansion end
 Base.getindex(e::AbstractExpansion, cluster_id::Int, order::Int) = _NI("Base.getindex")
 Base.length(e::AbstractExpansion) = _NI("Base.length")
 add_array!(e::AbstractExpansion, order::Int, per_cluster::AbstractVector{Float64}) = _NI("add_array!")
-order_ids(e::AbstractExpansion, order::Int) = _NI("num_clusters")
+order_ids(e::AbstractExpansion, order::Int) = _NI("order_ids")
 get_subclusters(e::AbstractExpansion, cluster_id::Int) = _NI("get_subclusters")
 
-function summation!(e::AbstractExpansion, max_order::Int)
+function _summation!(e::AbstractExpansion, max_order::Int)
         stack = Vector{Tuple{Int,Float64}}()
         per_cluster = zeros(Float64, length(e))
         for order in 1:max_order
@@ -40,25 +46,8 @@ function summation!(e::AbstractExpansion, max_order::Int)
         e
 end
 
-function write_to_file(e::AbstractExpansion, cs::AbstractClusterSet, lattice::AbstractLattice) 
-        clusters = []
-        for cluster in cs 
-                push!(clusters, 
-                        Dict(
-                                "Bond List" => [],
-                                "Coordinates" => [],
-                                "Site Colors" => [],
-                                "Multiplicities" => [],
-                        )
-                )
-        end
-
-        
-        json_clusters = JSON.json(clusters; pretty_print=true)
-
-end
-
 include("util.jl")
 include("SiteExpansions.jl")
+include("StrongClusterExpansions.jl")
 
 end
