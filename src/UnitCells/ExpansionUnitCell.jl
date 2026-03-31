@@ -13,14 +13,15 @@ struct ExpansionUnitCell
         primitive_vectors::Matrix{Float64}
         site_colors::Vector{Vector{Int}}
         bonds::Vector{ExpansionBond}
+        expansion_bonds::Vector{Bond}
 end
 
-function ExpansionUnitCell(basis::AbstractVector{<:AbstractVector{<:AbstractVector{Float64}}}, primitive_vectors::AbstractVector{<:AbstractVector{Float64}}, bonds::AbstractVector{ExpansionBond}, site_colors::AbstractVector{<:AbstractVector{Int}})
+function ExpansionUnitCell(basis::AbstractVector{<:AbstractVector{<:AbstractVector{Float64}}}, primitive_vectors::AbstractVector{<:AbstractVector{Float64}}, bonds::AbstractVector{ExpansionBond}, expansion_bonds::AbstractVector{Bond}, site_colors::AbstractVector{<:AbstractVector{Int}})
 
         @assert length(site_colors) == length(basis) "Number of site colors must match number of expansion basis elements"
         @assert all(length.(primitive_vectors) .== length(primitive_vectors)) "Primitive vectors must form a square matrix"
 
-        ExpansionUnitCell([hcat(b...) for b in basis], hcat(primitive_vectors...), site_colors, bonds)
+        ExpansionUnitCell([hcat(b...) for b in basis], hcat(primitive_vectors...), site_colors, bonds, expansion_bonds)
 end
 
 basis_size(unit_cell::ExpansionUnitCell) = size.(unit_cell.basis, 2)

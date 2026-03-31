@@ -1,0 +1,27 @@
+name: Benchmarks
+on:
+  pull_request:
+
+permissions:
+  pull-requests: write
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1'
+      - uses: julia-actions/cache@v2
+      - name: Run benchmarks
+        run: |
+          julia -e '
+            using Pkg
+            Pkg.add("BenchmarkCI")
+            using BenchmarkCI
+            BenchmarkCI.judge()
+            BenchmarkCI.postjudge()
+          '
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

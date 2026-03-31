@@ -1,7 +1,6 @@
 struct StrongClusterExpansionLattice <: AbstractClusterExpansionLattice
         max_order::UInt8
         expansion_unit_cell::ExpansionUnitCell
-        expansion_coordinates::Matrix{Int}
         lattice_coordinates::Vector{Matrix{Int}}
         adj_matrix::Matrix{Int}
         neighbor_list::Vector{ExpansionVertices{Int}}
