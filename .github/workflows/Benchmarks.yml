@@ -14,11 +14,11 @@ jobs:
         with:
           version: '1'
       - uses: julia-actions/cache@v2
+      - name: Install BenchmarkCI
+        run: julia -e 'using Pkg; Pkg.add(name="BenchmarkCI", version="0.1.8")'
       - name: Run benchmarks
         run: |
           julia -e '
-            using Pkg
-            Pkg.add("BenchmarkCI")
             using BenchmarkCI
             BenchmarkCI.judge(baseline="origin/main")
             BenchmarkCI.postjudge()

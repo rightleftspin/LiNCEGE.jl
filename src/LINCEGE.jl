@@ -5,7 +5,6 @@ module LINCEGE
 
 using Base.Threads
 using LinearAlgebra
-using Distances
 using NautyGraphs
 using JSON3
 

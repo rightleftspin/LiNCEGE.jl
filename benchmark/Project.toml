@@ -4,4 +4,4 @@ LINCEGE = "f7bb31c1-1dce-4f9f-a981-827e9ac9009b"
 
 [compat]
 BenchmarkTools = "1"
-julia = "1.9"
+julia = "1.10"
