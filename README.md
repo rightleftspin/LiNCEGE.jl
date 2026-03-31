@@ -4,16 +4,15 @@
 [![Build Status](https://github.com/rightleftspin/LINCEGE.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/rightleftspin/LINCEGE.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
 LINCEGE.jl is a Julia implementation of Numerical Linked Cluster Expansions
-(NLCEs) for generic finite or infinite lattices. Utilizing LINCEGE.jl, you can
-easily generate clusters and reduced lattice constants for any lattice in order
-to perform NLCE.
+(NLCEs) for generic lattices. Utilizing LINCEGE.jl, you can easily generate
+clusters and reduced lattice constants for any lattice in order to perform NLCE.
 
 ## Try LINCEGE.jl
 
 To try LINCEGE.jl for an example use case, try the
-[square lattice example](https://rightleftspin.gihub.io/LINCEGE.jl/) in the
-docs. For a more complicated site expansion example, try the
-[kagome lattice example](https://rightleftspin.gihub.io/LINCEGE.jl/)
+[square lattice example](https://rightleftspin.github.io/LINCEGE.jl/dev/examples/square_lattice/)
+in the docs. For a more complicated site expansion example, try the
+[kagome lattice example](https://rightleftspin.github.io/LINCEGE.jl/dev/examples/kagome_lattice/).
 
 ## Contact and Citation
 
