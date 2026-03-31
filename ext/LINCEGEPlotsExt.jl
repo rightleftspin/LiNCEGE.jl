@@ -2,10 +2,10 @@ module LINCEGEPlotsExt
 
 using Plots
 using ColorSchemes
-import LINCEGE: UnitCells
+using LINCEGE
 
-function UnitCells.image_unit_cell(unit_cell::UnitCells.UnitCell)
-        dim = UnitCells.dimension(unit_cell)
+function LINCEGE.image_unit_cell(unit_cell::UnitCell)
+        dim = LINCEGE.dimension(unit_cell)
         try
                 if dim == 2
                         return _image_unit_cell_2d(unit_cell)
@@ -21,7 +21,7 @@ function UnitCells.image_unit_cell(unit_cell::UnitCells.UnitCell)
         end
 end
 
-function _image_unit_cell_2d(unit_cell::UnitCells.UnitCell)
+function _image_unit_cell_2d(unit_cell::UnitCell)
         sitesInfo = []
 
         maxXValue = 0.1
@@ -42,7 +42,7 @@ function _image_unit_cell_2d(unit_cell::UnitCells.UnitCell)
         unitCellPlot = plot(legend=:best)
         firstLine = true
 
-        for i in 1:UnitCells.basis_size(unit_cell)
+        for i in 1:LINCEGE.basis_size(unit_cell)
                 basis_pos = unit_cell.basis[:, i]
                 push!(sitesInfo, [basis_pos[1], basis_pos[2], unit_cell.site_colors[i]])
         end
@@ -106,27 +106,30 @@ function _image_unit_cell_2d(unit_cell::UnitCells.UnitCell)
         return unitCellPlot
 end
 
-function _image_unit_cell_3d(unit_cell::UnitCells.UnitCell)
+function _image_unit_cell_3d(unit_cell::UnitCell)
         sitesInfo = []
-        maxXValue = 0.1; minXValue = -0.1
-        maxYValue = 0.1; minYValue = -0.1
-        maxZValue = 0.1; minZValue = -0.1
+        maxXValue = 0.1
+        minXValue = -0.1
+        maxYValue = 0.1
+        minYValue = -0.1
+        maxZValue = 0.1
+        minZValue = -0.1
 
         pv1 = unit_cell.primitive_vectors[:, 1]
         pv2 = unit_cell.primitive_vectors[:, 2]
         pv3 = unit_cell.primitive_vectors[:, 3]
 
         unitcellLines = [
-                [[0,0,0], pv1], [[0,0,0], pv2], [pv1, pv1.+pv2], [pv2, pv1.+pv2],
-                [pv3, pv3.+pv1], [pv3, pv3.+pv2], [pv3.+pv1, pv3.+pv1.+pv2],
-                [pv3.+pv2, pv3.+pv1.+pv2], [[0,0,0], pv3], [pv1, pv1.+pv3],
-                [pv2, pv2.+pv3], [pv1.+pv2, pv1.+pv2.+pv3]
+                [[0, 0, 0], pv1], [[0, 0, 0], pv2], [pv1, pv1 .+ pv2], [pv2, pv1 .+ pv2],
+                [pv3, pv3 .+ pv1], [pv3, pv3 .+ pv2], [pv3 .+ pv1, pv3 .+ pv1 .+ pv2],
+                [pv3 .+ pv2, pv3 .+ pv1 .+ pv2], [[0, 0, 0], pv3], [pv1, pv1 .+ pv3],
+                [pv2, pv2 .+ pv3], [pv1 .+ pv2, pv1 .+ pv2 .+ pv3]
         ]
 
         unitCellPlot = plot3d(legend=:outertopright)
         firstLine = true
 
-        for i in 1:UnitCells.basis_size(unit_cell)
+        for i in 1:LINCEGE.basis_size(unit_cell)
                 basis_pos = unit_cell.basis[:, i]
                 push!(sitesInfo, [basis_pos[1], basis_pos[2], basis_pos[3], unit_cell.site_colors[i]])
         end
@@ -137,13 +140,16 @@ function _image_unit_cell_3d(unit_cell::UnitCells.UnitCell)
                 prX, prY, prZ = bond.direction[1], bond.direction[2], bond.direction[3]
 
                 site1X, site1Y, site1Z = basis1[1], basis1[2], basis1[3]
-                site2X = basis2[1] + prX*pv1[1] + prY*pv2[1] + prZ*pv3[1]
-                site2Y = basis2[2] + prX*pv1[2] + prY*pv2[2] + prZ*pv3[2]
-                site2Z = basis2[3] + prX*pv1[3] + prY*pv2[3] + prZ*pv3[3]
+                site2X = basis2[1] + prX * pv1[1] + prY * pv2[1] + prZ * pv3[1]
+                site2Y = basis2[2] + prX * pv1[2] + prY * pv2[2] + prZ * pv3[2]
+                site2Z = basis2[3] + prX * pv1[3] + prY * pv2[3] + prZ * pv3[3]
 
-                maxXValue = max(maxXValue, site1X, site2X); minXValue = min(minXValue, site1X, site2X)
-                maxYValue = max(maxYValue, site1Y, site2Y); minYValue = min(minYValue, site1Y, site2Y)
-                maxZValue = max(maxZValue, site1Z, site2Z); minZValue = min(minZValue, site1Z, site2Z)
+                maxXValue = max(maxXValue, site1X, site2X)
+                minXValue = min(minXValue, site1X, site2X)
+                maxYValue = max(maxYValue, site1Y, site2Y)
+                minYValue = min(minYValue, site1Y, site2Y)
+                maxZValue = max(maxZValue, site1Z, site2Z)
+                minZValue = min(minZValue, site1Z, site2Z)
 
                 my_palette = colorschemes[:seaborn_bright]
                 plot3d!(unitCellPlot, [site1X, site2X], [site1Y, site2Y], [site1Z, site2Z],
@@ -152,9 +158,12 @@ function _image_unit_cell_3d(unit_cell::UnitCells.UnitCell)
 
         for i in 1:3
                 pv = unit_cell.primitive_vectors[:, i]
-                minXValue = min(minXValue, pv[1]); maxXValue = max(maxXValue, pv[1])
-                minYValue = min(minYValue, pv[2]); maxYValue = max(maxYValue, pv[2])
-                minZValue = min(minZValue, pv[3]); maxZValue = max(maxZValue, pv[3])
+                minXValue = min(minXValue, pv[1])
+                maxXValue = max(maxXValue, pv[1])
+                minYValue = min(minYValue, pv[2])
+                maxYValue = max(maxYValue, pv[2])
+                minZValue = min(minZValue, pv[3])
+                maxZValue = max(maxZValue, pv[3])
         end
 
         for l in unitcellLines
@@ -164,9 +173,9 @@ function _image_unit_cell_3d(unit_cell::UnitCells.UnitCell)
         end
 
         plot3d!(unitCellPlot,
-                xlims=(minXValue*1.1, maxXValue*1.1),
-                ylims=(minYValue*1.1, maxYValue*1.1),
-                zlims=(minZValue*1.1, maxZValue*1.1),
+                xlims=(minXValue * 1.1, maxXValue * 1.1),
+                ylims=(minYValue * 1.1, maxYValue * 1.1),
+                zlims=(minZValue * 1.1, maxZValue * 1.1),
                 aspect_ratio=:equal, xlabel="X", ylabel="Y", zlabel="Z")
 
         xPositions = getindex.(sitesInfo, 1)
@@ -188,4 +197,4 @@ function _image_unit_cell_3d(unit_cell::UnitCells.UnitCell)
         return unitCellPlot
 end
 
-end # module
+end

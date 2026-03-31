@@ -1,4 +1,4 @@
-# LINCEGE
+# LINCEGE.jl
 
 [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://rightleftspin.github.io/LINCEGE.jl/)
 [![Build Status](https://github.com/rightleftspin/LINCEGE.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/rightleftspin/LINCEGE.jl/actions/workflows/CI.yml?query=branch%3Amain)

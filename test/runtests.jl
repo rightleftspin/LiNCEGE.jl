@@ -1,31 +1,9 @@
 using Test
 using Plots
 using JSON3
-
-import LINCEGE:
-        Vertices.LatticeVertices,
-        Vertices.ExpansionVertices,
-        UnitCells.UnitCell,
-        UnitCells.Bond,
-        UnitCells.dimension,
-        UnitCells.basis_size,
-        UnitCells.shift_unit_cell,
-        UnitCells.image_unit_cell,
-        Lattices.AbstractLattice,
-        Lattices.SiteExpansionLattice,
-        Lattices.centers,
-        Lattices.max_order,
-        Lattices.neighbors,
-        Lattices.n_unique_sites,
-        Lattices.bond_matrix,
-        Clusters.TranslationClusterSet,
-        Clusters.SymmetricClusterSet,
-        Clusters.IsomorphicClusterSet,
-        Clusters.clusters_from_lattice!,
-        Clusters.clusters_from_clusters!,
-        Expansions.Expansion,
-        Expansions.summation!,
-        Expansions.write_to_json
+using LINCEGE
+import LINCEGE: basis_size, dimension, shift_unit_cell,
+        centers, max_order, n_unique_sites, neighbors, bond_matrix
 
 # ---------------------------------------------------------------------------
 # Shared unit cell definitions reused across multiple testsets
