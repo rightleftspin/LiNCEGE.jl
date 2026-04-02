@@ -8,7 +8,7 @@ to order 3, this utilizes the unit cell expansion on the lattice.
 Define the unit cell with basis positions, primitive vectors, and
 nearest-neighbour bonds:
 
-```@example square
+```@example pyrochlore
 using LINCEGE
 
 pyro_exp_uc_basis = [
@@ -59,7 +59,7 @@ Note that we use a StrongClusterExpansionLattice because the expansion does not
 share sites between different expansion units. If we were to do the tetrahedra
 expansion, we would use a WeakClusterExpansionLattice instead.
 
-```@example square
+```@example pyrochlore
 m_order = 3
 lattice = StrongClusterExpansionLattice(m_order, pyro_exp_uc_uc)
 
@@ -72,7 +72,7 @@ clusters_from_clusters!(iso_clusters, trans_clusters)
 
 ## Computing the expansion
 
-```@example square
+```@example pyrochlore
 expansion = Expansion(iso_clusters, lattice, m_order)
 summation!(expansion, m_order)
 expansion.weights

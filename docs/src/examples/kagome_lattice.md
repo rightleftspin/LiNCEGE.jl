@@ -1,6 +1,7 @@
 # Kagome Lattice
 
-This example computes the linked cluster expansion on a kagome lattice up to order 3.
+This example computes the linked cluster expansion on a kagome lattice up to
+order 3.
 
 ## Setup
 
