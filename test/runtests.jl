@@ -1,6 +1,6 @@
 using Test
 using Plots
-using JSON3
+using JSON
 using Lincege
 import Lincege: basis_size, dimension, shift_unit_cell,
         centers, max_order, n_unique_sites, neighbors, bond_matrix, weights

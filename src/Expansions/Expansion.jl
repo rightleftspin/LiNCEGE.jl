@@ -33,7 +33,7 @@ function Expansion(clusters::AbstractClusterSet, lattice::AbstractClusterExpansi
                 lv_hash = ghash(clusters, LatticeVertices(lv))
 
                 if !haskey(expansion_clusters, lv_hash)
-                        expansion_clusters[lv_hash] = ExpansionCluster(lv_hash, n_single_site_clusters)
+                        expansion_clusters[lv_hash] = ExpansionCluster(lv, lv_hash, n_single_site_clusters)
                         push!(order_ids[1], lv_hash)
                 end
 
