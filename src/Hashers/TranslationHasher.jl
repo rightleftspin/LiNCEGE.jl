@@ -13,6 +13,8 @@ end
 TranslationHasher(lattice::AbstractInfiniteLattice) = TranslationHasher(lattice, nothing)
 TranslationHasher(lattice::AbstractClusterExpansionLattice) = TranslationHasher(lattice, connections(lattice))
 
+n_unique_sites(h::TranslationHasher) = length(unique(h.hashing_matrix[diagind(h.hashing_matrix)]))
+
 ghash(h::TranslationHasher, lvs::LatticeVertices) = hash(sum(h.hashing_matrix[lvs, lvs], dims=2))
 ghash(h::TranslationHasher{StrongClusterConnections}, evs::ExpansionVertices) = ghash(h, union(LatticeVertices(), h.connections[evs]))
 

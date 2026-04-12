@@ -7,6 +7,7 @@ associated lattice coefficient used in the NLCE summation.
 Subtypes must implement:
 - `Base.length(c)` — number of sites (vertices) in the cluster
 - `Base.hash(c, h)` — the cluster's graph hash (`ghash`)
+- `lattice_constant` — the cluster's lattice constant
 """
 abstract type AbstractCluster end
 
@@ -29,6 +30,7 @@ abstract type AbstractClusterSet{C<:AbstractCluster,H<:AbstractHasher} end
 # Cluster Methods
 Base.length(c::AbstractCluster) = _NI("Base.length")
 Base.hash(c::AbstractCluster, h::UInt) = _NI("Base.hash")
+lattice_constant(c::AbstractCluster) = _NI("lattice_constant")
 
 Base.isequal(c1::C, c2::C) where {C<:AbstractCluster} = c1 == c2
 Base.:(==)(c1::C, c2::C) where {C<:AbstractCluster} = (hash(c1) == hash(c2))
@@ -42,6 +44,7 @@ Base.push!(cs::AbstractClusterSet{C,H}, c::C) where {C<:AbstractCluster,H} = _NI
 Base.pop!(cs::AbstractClusterSet{C,H}, c::C) where {C<:AbstractCluster,H} = _NI("Base.pop!")
 ghash(cs::AbstractClusterSet, c::AbstractCluster) = _NI("ghash")
 ghash(cs::AbstractClusterSet, vs::AbstractVertices) = _NI("ghash")
+n_unique_sites(cs::AbstractClusterSet) = _NI("n_unique_sites")
 
 include("util.jl")
 include("Cluster.jl")

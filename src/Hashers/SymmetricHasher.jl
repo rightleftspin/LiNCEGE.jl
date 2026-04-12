@@ -20,6 +20,7 @@ end
 SymmetricHasher(lattice::AbstractInfiniteLattice, lattice_symmetries::Vector{Matrix{Float64}}) = SymmetricHasher(lattice, lattice_symmetries, nothing)
 SymmetricHasher(lattice::AbstractClusterExpansionLattice, lattice_symmetries::Vector{Matrix{Float64}}) = SymmetricHasher(lattice, lattice_symmetries, connections(lattice))
 
+n_unique_sites(h::SymmetricHasher) = n_unique_sites(h.trans_hasher)
 function ghash(h::SymmetricHasher, lvs::LatticeVertices)
         all_hashes = Set()
         for perm in h.permutations

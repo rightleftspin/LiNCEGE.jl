@@ -15,6 +15,8 @@ end
 IsomorphicHasher(lattice::AbstractInfiniteLattice) = IsomorphicHasher(lattice, nothing)
 IsomorphicHasher(lattice::AbstractClusterExpansionLattice) = IsomorphicHasher(lattice, connections(lattice))
 
+n_unique_sites(h::IsomorphicHasher) = length(unique(h.labels))
+
 function ghash(h::IsomorphicHasher{StrongClusterConnections}, evs::ExpansionVertices)
         lvs = union(LatticeVertices(), h.connections[evs])
         ghash(h, lvs)

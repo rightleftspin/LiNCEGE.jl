@@ -10,3 +10,4 @@ end
 
 Base.length(c::Cluster) = length(c.vs)
 Base.hash(c::Cluster, h::UInt) = hash(c.ghash, h)
+lattice_constant(c::Cluster) = c.lc

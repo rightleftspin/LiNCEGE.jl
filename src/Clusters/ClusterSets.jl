@@ -51,6 +51,7 @@ Base.sort(cs::ClusterSet) = sort(collect(cs.clusters), by=length)
 
 ghash(cs::ClusterSet{C,H}, c::C) where {C<:AbstractCluster,H} = ghash(cs.hasher, c.vs)
 ghash(cs::ClusterSet, vs::AbstractVertices) = ghash(cs.hasher, vs)
+n_unique_sites(cs::ClusterSet) = n_unique_sites(cs.hasher)
 
 Base.show(io::IO, cs::ClusterSet{C,H}) where {C,H} =
         print(io, "ClusterSet{$(nameof(H))} with $(length(cs)) clusters")
