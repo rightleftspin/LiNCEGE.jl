@@ -11,6 +11,7 @@ end
 
 function Expansion(clusters::AbstractClusterSet, lattice::SiteExpansionLattice)
         expansion_clusters = Dict{UInt,ExpansionCluster}()
+        sizehint!(expansion_clusters, length(clusters))
         order_ids = [Vector{UInt}() for _ in 1:max_order(lattice)]
 
         for cluster in clusters
@@ -23,6 +24,7 @@ end
 
 function Expansion(clusters::AbstractClusterSet, lattice::AbstractClusterExpansionLattice)
         expansion_clusters = Dict{UInt,ExpansionCluster}()
+        sizehint!(expansion_clusters, length(clusters) + n_unique_sites(clusters))
         order_ids = [Vector{UInt}() for _ in 1:(max_order(lattice)+1)]
 
         # Adds Single Sites to the cluster expansion
@@ -53,6 +55,13 @@ each_order(e::Expansion, max_order::Int) = e.order_ids[1:max_order]
 order_offset(e::Expansion) = e.order_offset
 
 function weights(e::Expansion, order::Int)
-        cluster_hashes = e.order_ids[order]
-        merge(+, [get_nlce_contribution(e.expansion_clusters[ch]) for ch in cluster_hashes]...)
+        result = Dict{UInt,Float64}()
+        for ch in e.order_ids[order]
+                cluster = e.expansion_clusters[ch]
+                lc = cluster.lattice_constant
+                for (k, v) in cluster.weights
+                        result[k] = get(result, k, 0.0) + lc * v
+                end
+        end
+        result
 end
