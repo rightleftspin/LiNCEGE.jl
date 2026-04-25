@@ -31,7 +31,6 @@ include("Lattices/Lattices.jl")
 include("Hashers/Hashers.jl")
 include("Clusters/Clusters.jl")
 include("Expansions/Expansions.jl")
-include("Writers/Writers.jl")
 
 export AbstractVertices, LatticeVertices, ExpansionVertices,
         Bond, UnitCell, ExpansionBond, ExpansionUnitCell, image_unit_cell,

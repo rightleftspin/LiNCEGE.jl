@@ -47,6 +47,6 @@ function _summation!(e::AbstractExpansion, max_order::Int, order_offset::Int)
         e
 end
 
-include("util.jl")
 include("ExpansionCluster.jl")
 include("Expansion.jl")
+include("util.jl")
