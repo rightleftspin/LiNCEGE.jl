@@ -1,8 +1,8 @@
 using Test
 using Plots
 using JSON3
-using Lincege
-import Lincege: basis_size, dimension, shift_unit_cell,
+using LiNCEGE
+import LiNCEGE: basis_size, dimension, shift_unit_cell,
         centers, max_order, n_unique_sites, neighbors, bond_matrix
 
 # ---------------------------------------------------------------------------
@@ -109,7 +109,7 @@ square_cluster_uc = ExpansionUnitCell(
         [[1, 1, 1, 1]]
 )
 
-@testset verbose = true "Lincege.jl" begin
+@testset verbose = true "LiNCEGE.jl" begin
         include("test_vertices.jl")
         include("test_unitcells.jl")
         include("test_lattices.jl")

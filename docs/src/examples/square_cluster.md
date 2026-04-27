@@ -9,7 +9,7 @@ Define the unit cell with basis positions, primitive vectors, and
 nearest-neighbour bonds:
 
 ```@example square_cluster
-using Lincege
+using LiNCEGE
 
 square_cluster_basis = [[[-1 / 2, -1 / 2], [-1 / 2, 1 / 2], [1 / 2, -1 / 2], [1 / 2, 1 / 2]]]
 square_cluster_pvecs = [[1.0, 1.0], [1.0, -1.0]]

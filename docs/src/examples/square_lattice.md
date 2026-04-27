@@ -9,7 +9,7 @@ Define the unit cell with basis positions, primitive vectors, and
 nearest-neighbour bonds:
 
 ```@example square
-using Lincege
+using LiNCEGE
 
 square_basis = [[0.0, 0.0]]
 square_pvecs = [[1.0, 0.0], [0.0, 1.0]]

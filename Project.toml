@@ -1,4 +1,4 @@
-name = "Lincege"
+name = "LiNCEGE"
 uuid = "f7bb31c1-1dce-4f9f-a981-827e9ac9009b"
 authors = ["Pranav Seetharaman <pranav@myrdd.info> and contributors"]
 version = "1.0.0"
@@ -13,7 +13,7 @@ ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
 Plots = "91a5bcdd-55d7-5caf-9e0b-520d859cae80"
 
 [extensions]
-LincegePlotsExt = ["Plots", "ColorSchemes"]
+LiNCEGEPlotsExt = ["Plots", "ColorSchemes"]
 
 [compat]
 ColorSchemes = "3.31.0"

@@ -1,11 +1,11 @@
-module LincegePlotsExt
+module LiNCEGEPlotsExt
 
 using Plots
 using ColorSchemes
-using Lincege
+using LiNCEGE
 
-function Lincege.image_unit_cell(unit_cell::UnitCell)
-        dim = Lincege.dimension(unit_cell)
+function LiNCEGE.image_unit_cell(unit_cell::UnitCell)
+        dim = LiNCEGE.dimension(unit_cell)
         try
                 if dim == 2
                         return _image_unit_cell_2d(unit_cell)
@@ -42,7 +42,7 @@ function _image_unit_cell_2d(unit_cell::UnitCell)
         unitCellPlot = plot(legend=:best)
         firstLine = true
 
-        for i in 1:Lincege.basis_size(unit_cell)
+        for i in 1:LiNCEGE.basis_size(unit_cell)
                 basis_pos = unit_cell.basis[:, i]
                 push!(sitesInfo, [basis_pos[1], basis_pos[2], unit_cell.site_colors[i]])
         end
@@ -129,7 +129,7 @@ function _image_unit_cell_3d(unit_cell::UnitCell)
         unitCellPlot = plot3d(legend=:outertopright)
         firstLine = true
 
-        for i in 1:Lincege.basis_size(unit_cell)
+        for i in 1:LiNCEGE.basis_size(unit_cell)
                 basis_pos = unit_cell.basis[:, i]
                 push!(sitesInfo, [basis_pos[1], basis_pos[2], basis_pos[3], unit_cell.site_colors[i]])
         end

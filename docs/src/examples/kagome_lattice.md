@@ -8,7 +8,7 @@ order 3.
 Define the three-site kagome unit cell:
 
 ```@example kagome
-using Lincege
+using LiNCEGE
 
 kagome_basis = [[0.0, 0.0], [1.0, 0.0], [0.5, sqrt(3) / 2]]
 kagome_pvecs = [[2.0, 0.0], [1.0, sqrt(3)]]

@@ -9,7 +9,7 @@ Define the unit cell with basis positions, primitive vectors, and
 nearest-neighbour bonds:
 
 ```@example pyrochlore
-using Lincege
+using LiNCEGE
 
 pyro_exp_uc_basis = [
         [
