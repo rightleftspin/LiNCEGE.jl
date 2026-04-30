@@ -51,9 +51,8 @@ clusters_from_clusters!(iso_clusters, trans_clusters)
 ## Computing the expansion
 
 ```@example square_cluster
-expansion = Expansion(iso_clusters, lattice, m_order)
+expansion = Expansion(iso_clusters, lattice)
 summation!(expansion, m_order)
-expansion.weights
 ```
 
 ## Writing to JSON

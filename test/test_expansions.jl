@@ -68,40 +68,93 @@
         end
 
         @testset "write_to_json" begin
-                m_order = 2
-                lattice = SiteExpansionLattice(m_order, square_uc)
-                trans_clusters = TranslationClusterSet(lattice)
-                clusters_from_lattice!(trans_clusters, lattice)
-                iso_clusters = IsomorphicClusterSet(lattice)
-                clusters_from_clusters!(iso_clusters, trans_clusters)
-                expansion = Expansion(iso_clusters, lattice)
-                summation!(expansion, m_order)
+                expected_keys = ["bonds", "cluster_hash", "coordinates", "lattice_constant",
+                        "n_sites", "order", "site_colors", "subgraphs", "weights"]
 
-                mktempdir() do dir
-                        path = joinpath(dir, "expansion.json")
-                        write_to_json(expansion, lattice, iso_clusters, path)
+                @testset "SiteExpansionLattice" begin
+                        m_order = 2
+                        lattice = SiteExpansionLattice(m_order, square_uc)
+                        trans_clusters = TranslationClusterSet(lattice)
+                        clusters_from_lattice!(trans_clusters, lattice)
+                        iso_clusters = IsomorphicClusterSet(lattice)
+                        clusters_from_clusters!(iso_clusters, trans_clusters)
+                        expansion = Expansion(iso_clusters, lattice)
+                        summation!(expansion, m_order)
 
-                        data = JSON3.read(read(path, String))
+                        mktempdir() do dir
+                                path = joinpath(dir, "expansion.json")
+                                write_to_json(expansion, lattice, path)
+                                data = JSON.parse(read(path, String))
 
-                        @test length(data) == length(iso_clusters)
+                                @test length(data) == length(iso_clusters)
 
-                        for entry in data
-                                @test haskey(entry, :cluster_id)
-                                @test haskey(entry, :n_sites)
-                                @test haskey(entry, :coordinates)
-                                @test haskey(entry, :site_colors)
-                                @test haskey(entry, :bonds)
-                                @test haskey(entry, :weights)
+                                for entry in data
+                                        @test sort(collect(keys(entry))) == expected_keys
+                                end
+
+                                order1 = filter(e -> e["n_sites"] == 1, data)
+                                @test length(order1) == 1
+                                @test length(order1[1]["bonds"]) == 0
+
+                                order2 = filter(e -> e["n_sites"] == 2, data)
+                                @test length(order2) == 1
+                                @test length(order2[1]["bonds"]) == 1
+                                @test order2[1]["bonds"][1][end] == 1
                         end
+                end
 
-                        order1 = filter(e -> e[:n_sites] == 1, collect(data))
-                        @test length(order1) == 1
-                        @test length(order1[1][:bonds]) == 0
+                @testset "StrongClusterExpansionLattice" begin
+                        m_order = 2
+                        lattice = StrongClusterExpansionLattice(m_order, pyro_exp_uc_uc)
+                        trans_clusters = TranslationClusterSet(lattice)
+                        clusters_from_lattice!(trans_clusters, lattice)
+                        iso_clusters = IsomorphicClusterSet(lattice)
+                        clusters_from_clusters!(iso_clusters, trans_clusters)
+                        expansion = Expansion(iso_clusters, lattice)
+                        summation!(expansion, m_order)
 
-                        order2 = filter(e -> e[:n_sites] == 2, collect(data))
-                        @test length(order2) == 1
-                        @test length(order2[1][:bonds]) == 1
-                        @test order2[1][:bonds][1][end] == 1
+                        mktempdir() do dir
+                                path = joinpath(dir, "expansion.json")
+                                write_to_json(expansion, lattice, path)
+                                data = JSON.parse(read(path, String))
+
+                                @test length(data) == length(iso_clusters) + n_unique_sites(iso_clusters)
+
+                                for entry in data
+                                        @test sort(collect(keys(entry))) == expected_keys
+                                end
+
+                                order1 = filter(e -> e["order"] == 1, data)
+                                @test !isempty(order1)
+                                @test all(e -> e["n_sites"] == 1, order1)
+                        end
+                end
+
+                @testset "WeakClusterExpansionLattice" begin
+                        m_order = 2
+                        lattice = WeakClusterExpansionLattice(m_order, square_cluster_uc)
+                        trans_clusters = TranslationClusterSet(lattice)
+                        clusters_from_lattice!(trans_clusters, lattice)
+                        iso_clusters = IsomorphicClusterSet(lattice)
+                        clusters_from_clusters!(iso_clusters, trans_clusters)
+                        expansion = Expansion(iso_clusters, lattice)
+                        summation!(expansion, m_order)
+
+                        mktempdir() do dir
+                                path = joinpath(dir, "expansion.json")
+                                write_to_json(expansion, lattice, path)
+                                data = JSON.parse(read(path, String))
+
+                                @test length(data) == length(iso_clusters) + n_unique_sites(iso_clusters)
+
+                                for entry in data
+                                        @test sort(collect(keys(entry))) == expected_keys
+                                end
+
+                                order1 = filter(e -> e["order"] == 1, data)
+                                @test !isempty(order1)
+                                @test all(e -> e["n_sites"] == 1, order1)
+                        end
                 end
         end
 
