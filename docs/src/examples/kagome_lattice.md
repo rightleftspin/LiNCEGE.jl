@@ -32,7 +32,7 @@ treats these sites and interactions as equivalent.
 
 ## Imaging the unit cell and lattice
 
-Loading the Plots dependency automatically activates Lincege's plotting capabilities.
+Loading the Plots dependency automatically activates LiNCEGE.jl's plotting capabilities.
 
 ```@example kagome
 using Plots, ColorSchemes

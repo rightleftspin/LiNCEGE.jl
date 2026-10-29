@@ -10,9 +10,9 @@ DocMeta.setdocmeta!(Lincege, :DocTestSetup, :(using Lincege); recursive=true)
 makedocs(;
         modules=[Lincege],
         authors="Pranav Seetharaman <pjseetha@uwaterloo.ca> and contributors",
-        sitename="Lincege.jl",
+        sitename="LiNCEGE.jl",
         format=Documenter.HTML(;
-                canonical="https://rightleftspin.github.io/Lincege.jl",
+                canonical="https://rightleftspin.github.io/LiNCEGE.jl",
                 edit_link="main",
                 assets=String[],
                 prettyurls=false,
@@ -38,6 +38,6 @@ makedocs(;
 )
 
 deploydocs(;
-        repo="github.com/rightleftspin/Lincege.jl",
+        repo="github.com/rightleftspin/LiNCEGE.jl",
         devbranch="main",
 )
