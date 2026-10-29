@@ -1,6 +1,6 @@
 name = "Lincege"
 uuid = "f7bb31c1-1dce-4f9f-a981-827e9ac9009b"
-version = "1.0.0"
+version = "1.1.0"
 authors = ["Pranav Seetharaman <pjseetha@uwaterloo.ca> and contributors"]
 
 [deps]

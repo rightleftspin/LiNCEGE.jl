@@ -80,7 +80,7 @@ citation:
 	author  = {Seetharaman, Pranav and contributors},
 	title   = {LiNCEGE.jl},
 	url     = {https://github.com/rightleftspin/LiNCEGE.jl},
-	version = {v1.0.0},
+	version = {v1.1.0},
 	year    = {2026},
 	month   = {04}
 }
