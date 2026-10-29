@@ -1,5 +1,5 @@
 # This script is automatically generated without explanatory comments.
-# The documentation for this script exists at https://rightleftspin.github.io/Lincege.jl/dev/examples/shastry-sutherland.html
+# The documentation for this script exists at https://rightleftspin.github.io/LiNCEGE.jl/dev/examples/shastry-sutherland.html
 
 output_dir = joinpath(@__DIR__, "outputs")
 mkpath(output_dir)

@@ -1,5 +1,5 @@
 """
-A julia package for computing LINked Cluster Expansions on a GEneral geometry (LINCEGE).
+A julia package for computing LINked Cluster Expansions on a GEneral geometry (LiNCEGE).
 
 The general pipeline is:
 1. Define a unit cell and lattice geometry.
@@ -8,7 +8,7 @@ The general pipeline is:
 4. Call `summation!` to populate the NLCE weights.
 5. Export results with `write_to_json`.
 
-See the [online documentation](https://rightleftspin.github.io/Lincege.jl) for worked
+See the [online documentation](https://rightleftspin.github.io/LiNCEGE.jl) for worked
 examples on the square lattice, Kagome lattice, and Pyrochlore unit cell.
 """
 module Lincege

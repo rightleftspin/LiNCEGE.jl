@@ -31,7 +31,7 @@ treat all sites as the same species.
 
 ## Imaging the unit cell and lattice
 
-Load Plots and ColorSchemes to activate Lincege's plotting capabilities.
+Load Plots and ColorSchemes to activate LiNCEGE.jl's plotting capabilities.
 
 ```@example lieb
 using Plots, ColorSchemes

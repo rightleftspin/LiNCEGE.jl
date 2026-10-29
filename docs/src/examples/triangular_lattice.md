@@ -31,7 +31,7 @@ and bond types treat these sites and interactions as equivalent.
 
 ## Imaging the unit cell and lattice
 
-Load Plots and ColorSchemes to activate Lincege's plotting capabilities.
+Load Plots and ColorSchemes to activate LiNCEGE.jl's plotting capabilities.
 
 ```@example triangular
 using Plots, ColorSchemes

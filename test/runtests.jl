@@ -42,7 +42,7 @@ pyro_exp_uc_uc = Lincege.pyrochlore_expansion_unit_cell
 # Square Lattice Square Expansion
 square_cluster_uc = Lincege.square_cluster_expansion_unit_cell
 
-@testset verbose = true "Lincege.jl" begin
+@testset verbose = true "LiNCEGE.jl" begin
         include("test_vertices.jl")
         include("test_unitcells.jl")
         include("test_lattices.jl")
